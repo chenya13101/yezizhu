@@ -27,6 +27,7 @@
 			<version>4.1.6.RELEASE</version>
 		</dependency>
 
+		<!-- AOP Start -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
@@ -42,5 +43,14 @@
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.8.5</version>
 		</dependency>
+		<!-- AOP end -->
+
+		<!-- Spring EL start -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<!-- Spring EL end -->
 	</dependencies>
 </project>
