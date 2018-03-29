@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DemoApplication {
 
-	@RequestMapping("/")
+	@RequestMapping("/index")
 	public String index() {
 		return "Hello Spring boot";
 	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
-		//访问 http://localhost:8080/
+		//访问 http://localhost:9090/spring-boot/index
 	}
 }
