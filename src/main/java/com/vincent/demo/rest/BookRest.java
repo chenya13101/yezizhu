@@ -1,5 +1,7 @@
 package com.vincent.demo.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,8 @@ import com.vincent.demo.component.settings.AuthorSettings;
 @RestController
 @RequestMapping("book")
 public class BookRest {
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Value("${book.name}")
 	private String bookName;
 
@@ -39,6 +43,10 @@ public class BookRest {
 
 	@RequestMapping("/getAuthorInfo")
 	public String getAuthorInfo() {
+		logger.debug("日志输出测试 Debug");
+		logger.trace("日志输出测试 Trace");
+		logger.info("日志输出测试 Info");
+		logger.error("日志输出测试 error");
 		// url = http://localhost:9090/spring-boot/book/getAuthorInfo
 		String s = authorSettings.getAge() + " \n " + authorSettings.getCity();
 		return s;
