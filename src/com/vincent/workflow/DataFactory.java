@@ -15,6 +15,10 @@ public class DataFactory {
 		Coupon c1 = new Coupon("A001", CouponTypeEnum.CASH, null, new BigDecimal("10"), new BigDecimal(50),
 				(input) -> input != null && (input.indexOf("a") > -1 || input.indexOf("c") > -1));
 		list.add(c1);
+
+		Coupon c2 = new Coupon("A002", CouponTypeEnum.DISCOUNT, new BigDecimal(8.5), null, new BigDecimal(50),
+				(input) -> input != null && (input.indexOf("coffee") > -1 || input.indexOf("p") > -1));
+		list.add(c2);
 		return list;
 	}
 

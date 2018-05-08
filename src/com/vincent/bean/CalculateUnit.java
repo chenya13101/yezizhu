@@ -55,4 +55,16 @@ public class CalculateUnit {
 		this.productCode = productCode;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("max =").append(max).append("; min=").append(this.min).append("; current = ")
+				.append(this.currentValue).append("; productCode = ").append(this.productCode);
+		if (this.calculateUnits != null) {
+			builder.append("\n");
+			this.calculateUnits.forEach(unit -> builder.append(unit.toString()).append("\n"));
+		}
+
+		return builder.toString();
+	}
 }

@@ -1,14 +1,16 @@
 package com.vincent.common;
 
-import java.util.List;
+import java.util.Set;
+
+import com.vincent.bean.CalculateUnit;
 
 public class ResultMessage {
 
 	private boolean success;
 
-	private List<String> addPriceProductCodes;
+	private MathMethod method;
 
-	private List<String> subPriceProductCodes;
+	private Set<CalculateUnit> unitSet;
 
 	public boolean isSuccess() {
 		return success;
@@ -18,20 +20,20 @@ public class ResultMessage {
 		this.success = success;
 	}
 
-	public List<String> getAddPriceProductCodes() {
-		return addPriceProductCodes;
+	public MathMethod getMethod() {
+		return method;
 	}
 
-	public void setAddPriceProductCodes(List<String> addPriceProductCodes) {
-		this.addPriceProductCodes = addPriceProductCodes;
+	public void setMethod(MathMethod method) {
+		this.method = method;
 	}
 
-	public List<String> getSubPriceProductCodes() {
-		return subPriceProductCodes;
+	public Set<CalculateUnit> getUnitSet() {
+		return unitSet;
 	}
 
-	public void setSubPriceProductCodes(List<String> subPriceProductCodes) {
-		this.subPriceProductCodes = subPriceProductCodes;
+	public void setUnitSet(Set<CalculateUnit> unitSet) {
+		this.unitSet = unitSet;
 	}
 
 }

@@ -38,6 +38,7 @@ public class WorkFlow {
 				condition.setCalculateUnitSet(calculateUnitSet);
 				step.setCondition(condition);
 			}
+			step.setCoupon(coupon);
 
 			return step;
 		}).collect(Collectors.toList());
