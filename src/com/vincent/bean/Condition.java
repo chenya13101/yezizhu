@@ -49,6 +49,7 @@ public class Condition {
 		result.setSuccess(false);
 		result.setMethod(MathMethod.ADD);
 		result.setUnitSet(this.calculateUnitSet);
+		result.setMin(this.fullElement);
 		return result;
 	}
 

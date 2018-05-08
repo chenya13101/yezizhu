@@ -1,5 +1,6 @@
 package com.vincent.common;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import com.vincent.bean.CalculateUnit;
@@ -9,6 +10,8 @@ public class ResultMessage {
 	private boolean success;
 
 	private MathMethod method;
+
+	private BigDecimal min;
 
 	private Set<CalculateUnit> unitSet;
 
@@ -34,6 +37,14 @@ public class ResultMessage {
 
 	public void setUnitSet(Set<CalculateUnit> unitSet) {
 		this.unitSet = unitSet;
+	}
+
+	public BigDecimal getMin() {
+		return min;
+	}
+
+	public void setMin(BigDecimal min) {
+		this.min = min;
 	}
 
 }

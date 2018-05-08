@@ -12,7 +12,10 @@ import com.vincent.common.ResultMessage;
 
 public class WorkStep {
 
-	private final BigDecimal tenPercent = new BigDecimal(0.1);
+	private final BigDecimal ten = new BigDecimal(10);
+
+	private final int numsAfterPoint = 4;
+
 	private Condition condition;
 
 	private List<CalculateUnit> calculateUnits;
@@ -88,7 +91,7 @@ public class WorkStep {
 
 	private void discount(BigDecimal discount, List<CalculateUnit> calculateUnits2) {
 		calculateUnits2.forEach(unit -> {
-			unit.setCurrentValue(unit.getMax().multiply(discount).multiply(tenPercent));
+			unit.setCurrentValue(unit.getMax().multiply(discount).divide(ten, numsAfterPoint, RoundingMode.HALF_UP));
 		});
 	}
 
@@ -102,7 +105,8 @@ public class WorkStep {
 		for (int i = 0; i < calculateUnits2.size(); i++) {
 			unit = calculateUnits2.get(i);
 			if (i != calculateUnits2.size() - 1) {
-				unit.setCurrentValue(unit.getMax().multiply(amount).divide(total, 4, RoundingMode.HALF_UP));
+				unit.setCurrentValue(
+						unit.getMax().multiply(amount).divide(total, numsAfterPoint, RoundingMode.HALF_UP));
 				previousTotal = previousTotal.add(unit.getCurrentValue());
 			} else {
 				unit.setCurrentValue(unit.getMax().subtract(amount.subtract(previousTotal)));
@@ -110,20 +114,22 @@ public class WorkStep {
 		}
 	}
 
+	private void dealFailMessage(ResultMessage result) {
+		System.out.println("处理next传递来的修改请求");
+	}
+
 	public void run() {
 		ResultMessage result = this.check();
 		if (!result.isSuccess()) {
+			printFailMessage(result);
 			// 平摊失败
 			if (previousStep == null) {
-				if (this.calculateUnits.size() == 1) {
-					System.out.println("結束");
-				}
-				System.out.println("继续找办法平摊 或者 [结束]");
+				System.out.println("結束");
 				return;
 			}
-			System.out.println("通知之前的步骤调整");
-			// 通知之前的步骤调整
-			printFailMessage(result);
+
+			previousStep.dealFailMessage(result); // 通知之前的步骤调整
+			return;
 		}
 
 		this.work();
@@ -135,8 +141,7 @@ public class WorkStep {
 	}
 
 	private void printFailMessage(ResultMessage result) {
-		System.out.println("平摊失败啦");
-		System.out.println(result.getMethod());
+		System.out.println("平摊失败: 需要[" + result.getMethod() + "] min=" + result.getMin());
 		result.getUnitSet().forEach(System.out::println);
 	}
 
