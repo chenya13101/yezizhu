@@ -10,6 +10,7 @@ import com.vincent.bean.CalculateUnit;
 import com.vincent.bean.Condition;
 import com.vincent.bean.Coupon;
 import com.vincent.bean.CouponTypeEnum;
+import com.vincent.common.ResultCode;
 import com.vincent.common.ResultMessage;
 
 public class WorkStep {
@@ -114,10 +115,10 @@ public class WorkStep {
 		}
 	}
 
-	private void dealFailMessageFromNextStep(ResultMessage result) {
+	private ResultMessage dealFailMessageFromNextStep(ResultMessage result) {
 		if (this.calculateUnits.size() == 0 && this.previousStep == null) {
 			System.out.println("无法进一步处理,结束");
-			return;
+			return new ResultMessage(ResultCode.FAIL_END);
 		}
 
 		System.out.println("处理next传递来的修改请求");
@@ -126,6 +127,14 @@ public class WorkStep {
 		Set<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
 				.collect(Collectors.toSet());
 		if (sameUnitSet != null && sameUnitSet.size() > 0) {
+			if (this.calculateUnits.size() == 1) {
+				if (previousStep != null) {
+					previousStep.dealFailMessageFromNextStep(result);
+				} else {
+					return new ResultMessage(ResultCode.FAIL_END);
+				}
+			}
+
 			// 如果这一步就已经包含了next的某个unit，那么尝试通过只改本步骤，而不继续往上来修改unit
 			CouponTypeEnum typeEnum = coupon.getCouponTypeEnum();
 			switch (typeEnum) {
@@ -140,6 +149,7 @@ public class WorkStep {
 				break;
 			}
 		}
+		return new ResultMessage(ResultCode.SUCCESS);
 	}
 
 	private void specialDistribute(BigDecimal amount, List<CalculateUnit> calculateUnits2,
@@ -156,7 +166,15 @@ public class WorkStep {
 
 	public void run() {
 		ResultMessage result = this.check();
-		if (!result.isSuccess()) {
+		switch (result.getResultCode()) {
+		case SUCCESS:
+			this.work();
+			printUnits();
+			if (nextStep != null) {
+				nextStep.run();
+			}
+			break;
+		case FAIL:
 			printFailMessage(result);
 			// 平摊失败
 			if (previousStep == null) {
@@ -164,16 +182,29 @@ public class WorkStep {
 				return;
 			}
 
-			previousStep.dealFailMessageFromNextStep(result); // 通知之前的步骤调整
-			return;
+			ResultMessage previousResult = previousStep.dealFailMessageFromNextStep(result); // 通知之前的步骤调整
+			switch (previousResult.getResultCode()) {
+			case SUCCESS:
+				System.out.println("上一步骤处理成功，请开始这一步的业务逻辑");
+				break;
+			case FAIL_END:
+			case FAIL:
+				System.out.println("上一步骤处理失败,结束流程");
+				break;
+			default:
+				break;
+			}
+			break;
+		case END:
+			System.out.println("正常结束");
+			break;
+		case FAIL_END:
+			System.out.println("失败结束");
+			break;
+		default:
+			break;
 		}
 
-		this.work();
-		printUnits();
-		if (nextStep != null) {
-			nextStep.run();
-			return;
-		}
 	}
 
 	private void printFailMessage(ResultMessage result) {

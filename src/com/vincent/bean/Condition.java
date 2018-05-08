@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 import com.vincent.common.MathMethod;
+import com.vincent.common.ResultCode;
 import com.vincent.common.ResultMessage;
 
 public class Condition {
@@ -43,10 +44,10 @@ public class Condition {
 		BigDecimal total = calculateUnitSet.stream().map(unit -> unit.getCurrentValue()).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		if (total.compareTo(fullElement) >= 0) {
-			result.setSuccess(true);
+			result.setResultCode(ResultCode.SUCCESS);
 			return result;
 		}
-		result.setSuccess(false);
+		result.setResultCode(ResultCode.FAIL);
 		result.setMethod(MathMethod.ADD);
 		result.setUnitSet(this.calculateUnitSet);
 		result.setMin(this.fullElement);

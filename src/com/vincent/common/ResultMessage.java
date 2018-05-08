@@ -7,7 +7,7 @@ import com.vincent.bean.CalculateUnit;
 
 public class ResultMessage {
 
-	private boolean success;
+	private ResultCode resultCode;
 
 	private MathMethod method;
 
@@ -16,12 +16,20 @@ public class ResultMessage {
 
 	private Set<CalculateUnit> unitSet;
 
-	public boolean isSuccess() {
-		return success;
+	public ResultMessage() {
+
 	}
 
-	public void setSuccess(boolean success) {
-		this.success = success;
+	public ResultMessage(ResultCode result) {
+		this.resultCode = result;
+	}
+
+	public ResultCode getResultCode() {
+		return resultCode;
+	}
+
+	public void setResultCode(ResultCode resultCode) {
+		this.resultCode = resultCode;
 	}
 
 	public MathMethod getMethod() {
