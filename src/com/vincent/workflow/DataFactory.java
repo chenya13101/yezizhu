@@ -26,6 +26,9 @@ public class DataFactory {
 		List<Product> list = new ArrayList<>();
 		Product p1 = new Product("apple", new BigDecimal(40));
 		list.add(p1);
+
+		Product p2 = new Product("apple", new BigDecimal(20));
+		list.add(p2);
 		return list;
 	}
 }

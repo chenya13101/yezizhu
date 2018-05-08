@@ -67,8 +67,7 @@ public class WorkStep {
 	}
 
 	private ResultMessage check() {
-		ResultMessage message = condition.isAvailable();
-		return message;
+		return condition.isAvailable();
 	}
 
 	private void work() {
@@ -91,7 +90,8 @@ public class WorkStep {
 
 	private void discount(BigDecimal discount, List<CalculateUnit> calculateUnits2) {
 		calculateUnits2.forEach(unit -> {
-			unit.setCurrentValue(unit.getMax().multiply(discount).divide(ten, numsAfterPoint, RoundingMode.HALF_UP));
+			unit.setCurrentValue(
+					unit.getCurrentValue().multiply(discount).divide(ten, numsAfterPoint, RoundingMode.HALF_UP));
 		});
 	}
 
@@ -101,15 +101,16 @@ public class WorkStep {
 		}).reduce(BigDecimal.ZERO, BigDecimal::add);
 
 		CalculateUnit unit;
-		BigDecimal previousTotal = BigDecimal.ZERO;
+		BigDecimal previousAmountTotal = BigDecimal.ZERO;
+		BigDecimal tmpReduce;
 		for (int i = 0; i < calculateUnits2.size(); i++) {
 			unit = calculateUnits2.get(i);
 			if (i != calculateUnits2.size() - 1) {
-				unit.setCurrentValue(
-						unit.getMax().multiply(amount).divide(total, numsAfterPoint, RoundingMode.HALF_UP));
-				previousTotal = previousTotal.add(unit.getCurrentValue());
+				tmpReduce = unit.getCurrentValue().multiply(amount).divide(total, numsAfterPoint, RoundingMode.HALF_UP);
+				unit.setCurrentValue(unit.getCurrentValue().subtract(tmpReduce));
+				previousAmountTotal = previousAmountTotal.add(tmpReduce);
 			} else {
-				unit.setCurrentValue(unit.getMax().subtract(amount.subtract(previousTotal)));
+				unit.setCurrentValue(unit.getCurrentValue().subtract(amount.subtract(previousAmountTotal)));
 			}
 		}
 	}
@@ -133,11 +134,11 @@ public class WorkStep {
 		}
 
 		this.work();
+		printUnits();
 		if (nextStep != null) {
 			nextStep.run();
 			return;
 		}
-		printUnits();
 	}
 
 	private void printFailMessage(ResultMessage result) {
