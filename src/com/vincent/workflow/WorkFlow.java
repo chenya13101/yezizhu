@@ -40,6 +40,7 @@ public class WorkFlow {
 				Set<CalculateUnit> calculateUnitSet = calculateUnits.stream()
 						.filter(unit -> coupon.getFilterRule().checkInRange(unit.getProductCode()))
 						.collect(Collectors.toSet());
+				// TODO 这里整合成一个 AB而不是A+B
 				condition.setCalculateUnitSet(calculateUnitSet);
 				step.setCondition(condition);
 			}

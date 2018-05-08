@@ -140,11 +140,9 @@ public class WorkStep {
 			switch (typeEnum) {
 			case DISCOUNT:
 				// FIXME 似乎不应该出现这种对象，而应该用unit =A+B来处理
-				specialDiscount(coupon.getDiscount(), calculateUnits, sameUnitSet, result.getMin());
-				break;
+				return specialDiscount(coupon.getDiscount(), calculateUnits, sameUnitSet, result.getMin());
 			case CASH:
-				specialDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getMin());
-				break;
+				return specialDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getMin());
 			default:
 				break;
 			}
@@ -152,15 +150,16 @@ public class WorkStep {
 		return new ResultMessage(ResultCode.SUCCESS);
 	}
 
-	private void specialDistribute(BigDecimal amount, List<CalculateUnit> calculateUnits2,
+	private ResultMessage specialDistribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam,
 			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
-	private void specialDiscount(BigDecimal discount, List<CalculateUnit> calculateUnits2,
+	private ResultMessage specialDiscount(BigDecimal discount, List<CalculateUnit> calculateUnitsParam,
 			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
 		// TODO Auto-generated method stub
+		return null;
 
 	}
 
