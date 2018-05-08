@@ -12,6 +12,7 @@ import com.vincent.common.ResultMessage;
 
 public class WorkStep {
 
+	private final BigDecimal tenPercent = new BigDecimal(0.1);
 	private Condition condition;
 
 	private List<CalculateUnit> calculateUnits;
@@ -63,12 +64,6 @@ public class WorkStep {
 	}
 
 	private ResultMessage check() {
-		if (condition != null) {
-			System.out.println(condition.getQrCode());
-		} else {
-			System.out.println(System.nanoTime() / 1000000);
-		}
-
 		ResultMessage message = condition.isAvailable();
 		return message;
 	}
@@ -92,8 +87,9 @@ public class WorkStep {
 	}
 
 	private void discount(BigDecimal discount, List<CalculateUnit> calculateUnits2) {
-		// TODO Auto-generated method stub
-
+		calculateUnits2.forEach(unit -> {
+			unit.setCurrentValue(unit.getMax().multiply(discount).multiply(tenPercent));
+		});
 	}
 
 	private void distribute(BigDecimal amount, List<CalculateUnit> calculateUnits2) {
@@ -109,7 +105,7 @@ public class WorkStep {
 				unit.setCurrentValue(unit.getMax().multiply(amount).divide(total, 4, RoundingMode.HALF_UP));
 				previousTotal = previousTotal.add(unit.getCurrentValue());
 			} else {
-				unit.setCurrentValue(amount.subtract(previousTotal));
+				unit.setCurrentValue(unit.getMax().subtract(amount.subtract(previousTotal)));
 			}
 		}
 	}
@@ -120,11 +116,33 @@ public class WorkStep {
 		if (result.isSuccess()) {
 			if (nextStep != null) {
 				nextStep.run();
+				return;
 			}
-		} else {
-			System.out.println(result.getMethod());
-			result.getUnitSet().forEach(System.out::println);
+			printUnits();
+			return;
 		}
 
+		printFailMessage(result);
+
+		// 平摊失败
+		if (previousStep == null) {
+			System.out.println("继续找办法平摊 或者 [结束]");
+			return;
+		} else {
+			System.out.println("通知之前的步骤调整");
+			// 通知之前的步骤调整
+		}
+
+	}
+
+	private void printFailMessage(ResultMessage result) {
+		System.out.println("平摊失败啦");
+		System.out.println(result.getMethod());
+		result.getUnitSet().forEach(System.out::println);
+	}
+
+	private void printUnits() {
+		System.out.println("success:");
+		calculateUnits.forEach(unit -> System.out.println(unit));
 	}
 }
