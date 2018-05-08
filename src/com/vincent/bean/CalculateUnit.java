@@ -5,6 +5,7 @@ import java.util.List;
 
 public class CalculateUnit {
 
+	// TODO 有没有必要保存修改之前的值
 	private BigDecimal max;
 
 	private BigDecimal min;

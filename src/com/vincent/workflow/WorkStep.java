@@ -3,6 +3,8 @@ package com.vincent.workflow;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.vincent.bean.CalculateUnit;
 import com.vincent.bean.Condition;
@@ -83,9 +85,6 @@ public class WorkStep {
 			coupon.getDiscount();
 			break;
 		}
-
-		// TODO 除了condition还有正常的业务运算,操作价格的方法呢
-		// calculateUnits
 	}
 
 	private void discount(BigDecimal discount, List<CalculateUnit> calculateUnits2) {
@@ -95,17 +94,17 @@ public class WorkStep {
 		});
 	}
 
-	private void distribute(BigDecimal amount, List<CalculateUnit> calculateUnits2) {
-		BigDecimal total = calculateUnits2.stream().map(unit -> {
+	private void distribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam) {
+		BigDecimal total = calculateUnitsParam.stream().map(unit -> {
 			return unit.getCurrentValue() == null ? unit.getMax() : unit.getCurrentValue();
 		}).reduce(BigDecimal.ZERO, BigDecimal::add);
 
 		CalculateUnit unit;
 		BigDecimal previousAmountTotal = BigDecimal.ZERO;
 		BigDecimal tmpReduce;
-		for (int i = 0; i < calculateUnits2.size(); i++) {
-			unit = calculateUnits2.get(i);
-			if (i != calculateUnits2.size() - 1) {
+		for (int i = 0; i < calculateUnitsParam.size(); i++) {
+			unit = calculateUnitsParam.get(i);
+			if (i != calculateUnitsParam.size() - 1) {
 				tmpReduce = unit.getCurrentValue().multiply(amount).divide(total, numsAfterPoint, RoundingMode.HALF_UP);
 				unit.setCurrentValue(unit.getCurrentValue().subtract(tmpReduce));
 				previousAmountTotal = previousAmountTotal.add(tmpReduce);
@@ -115,8 +114,44 @@ public class WorkStep {
 		}
 	}
 
-	private void dealFailMessage(ResultMessage result) {
+	private void dealFailMessageFromNextStep(ResultMessage result) {
+		if (this.calculateUnits.size() == 0 && this.previousStep == null) {
+			System.out.println("无法进一步处理,结束");
+			return;
+		}
+
 		System.out.println("处理next传递来的修改请求");
+
+		Set<CalculateUnit> nextUnits = result.getUnitSet();
+		Set<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
+				.collect(Collectors.toSet());
+		if (sameUnitSet != null && sameUnitSet.size() > 0) {
+			// 如果这一步就已经包含了next的某个unit，那么尝试通过只改本步骤，而不继续往上来修改unit
+			CouponTypeEnum typeEnum = coupon.getCouponTypeEnum();
+			switch (typeEnum) {
+			case DISCOUNT:
+				// FIXME 似乎不应该出现这种对象，而应该用unit =A+B来处理
+				specialDiscount(coupon.getDiscount(), calculateUnits, sameUnitSet, result.getMin());
+				break;
+			case CASH:
+				specialDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getMin());
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	private void specialDistribute(BigDecimal amount, List<CalculateUnit> calculateUnits2,
+			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void specialDiscount(BigDecimal discount, List<CalculateUnit> calculateUnits2,
+			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public void run() {
@@ -129,7 +164,7 @@ public class WorkStep {
 				return;
 			}
 
-			previousStep.dealFailMessage(result); // 通知之前的步骤调整
+			previousStep.dealFailMessageFromNextStep(result); // 通知之前的步骤调整
 			return;
 		}
 

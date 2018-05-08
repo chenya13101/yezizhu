@@ -11,6 +11,7 @@ public class ResultMessage {
 
 	private MathMethod method;
 
+	// TODO method 和 min是不是只要有一个就够了
 	private BigDecimal min;
 
 	private Set<CalculateUnit> unitSet;

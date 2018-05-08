@@ -42,7 +42,7 @@ public class Condition {
 		ResultMessage result = new ResultMessage();
 		BigDecimal total = calculateUnitSet.stream().map(unit -> unit.getCurrentValue()).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
-		if (total.compareTo(fullElement) > 0) {
+		if (total.compareTo(fullElement) >= 0) {
 			result.setSuccess(true);
 			return result;
 		}
