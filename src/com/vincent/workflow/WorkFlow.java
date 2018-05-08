@@ -17,13 +17,18 @@ public class WorkFlow {
 			return;
 
 		List<Product> productList = DataFactory.getProducts();
-		List<CalculateUnit> calculateUnits = productList.stream().map(product -> {
-			CalculateUnit unit = new CalculateUnit();
-			unit.setMax(product.getPrice());
-			unit.setProductCode(product.getCode());
-			return unit;
-		}).collect(Collectors.toList());
 
+		WorkFlow workFlow = new WorkFlow();
+		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
+		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start(steps);
+	}
+
+	private void start(List<WorkStep> steps) {
+		steps.get(0).run();
+	}
+
+	private List<WorkStep> createWorkSteps(List<Coupon> couponList, List<CalculateUnit> calculateUnits) {
 		List<WorkStep> steps = couponList.stream().map(coupon -> {
 			WorkStep step = new WorkStep();
 			step.setCalculateUnits(calculateUnits);
@@ -52,8 +57,17 @@ public class WorkFlow {
 			step.setPreviousStep(previous);
 			previous.setNextStep(step);
 		}
+		return steps;
+	}
 
-		steps.get(0).run();
+	private List<CalculateUnit> createCalculateUnits(List<Product> productList) {
+		return productList.stream().map(product -> {
+			CalculateUnit unit = new CalculateUnit();
+			unit.setMax(product.getPrice());
+			unit.setCurrentValue(product.getPrice());
+			unit.setProductCode(product.getCode());
+			return unit;
+		}).collect(Collectors.toList());
 	}
 
 }

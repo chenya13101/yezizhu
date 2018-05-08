@@ -111,28 +111,27 @@ public class WorkStep {
 	}
 
 	public void run() {
-		this.work();
 		ResultMessage result = this.check();
-		if (result.isSuccess()) {
-			if (nextStep != null) {
-				nextStep.run();
+		if (!result.isSuccess()) {
+			// 平摊失败
+			if (previousStep == null) {
+				if (this.calculateUnits.size() == 1) {
+					System.out.println("結束");
+				}
+				System.out.println("继续找办法平摊 或者 [结束]");
 				return;
 			}
-			printUnits();
-			return;
-		}
-
-		printFailMessage(result);
-
-		// 平摊失败
-		if (previousStep == null) {
-			System.out.println("继续找办法平摊 或者 [结束]");
-			return;
-		} else {
 			System.out.println("通知之前的步骤调整");
 			// 通知之前的步骤调整
+			printFailMessage(result);
 		}
 
+		this.work();
+		if (nextStep != null) {
+			nextStep.run();
+			return;
+		}
+		printUnits();
 	}
 
 	private void printFailMessage(ResultMessage result) {
