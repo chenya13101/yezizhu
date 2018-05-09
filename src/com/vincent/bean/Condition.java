@@ -1,7 +1,6 @@
 package com.vincent.bean;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 import com.vincent.common.MathMethod;
 import com.vincent.common.ResultCode;
@@ -13,7 +12,7 @@ public class Condition {
 
 	private BigDecimal fullElement;
 
-	private Set<CalculateUnit> calculateUnitSet;
+	private CalculateUnit calculateUnit;
 
 	public String getQrCode() {
 		return qrCode;
@@ -31,25 +30,23 @@ public class Condition {
 		this.fullElement = fullElement;
 	}
 
-	public Set<CalculateUnit> getCalculateUnitSet() {
-		return calculateUnitSet;
+	public CalculateUnit getCalculateUnit() {
+		return calculateUnit;
 	}
 
-	public void setCalculateUnitSet(Set<CalculateUnit> calculateUnitSet) {
-		this.calculateUnitSet = calculateUnitSet;
+	public void setCalculateUnit(CalculateUnit calculateUnit) {
+		this.calculateUnit = calculateUnit;
 	}
 
 	public ResultMessage isAvailable() {
 		ResultMessage result = new ResultMessage();
-		BigDecimal total = calculateUnitSet.stream().map(unit -> unit.getCurrentValue()).reduce(BigDecimal.ZERO,
-				BigDecimal::add);
-		if (total.compareTo(fullElement) >= 0) {
+		if (this.calculateUnit.getCurrentValue().compareTo(fullElement) >= 0) {
 			result.setResultCode(ResultCode.SUCCESS);
 			return result;
 		}
 		result.setResultCode(ResultCode.FAIL);
 		result.setMethod(MathMethod.ADD);
-		result.setUnitSet(this.calculateUnitSet);
+		result.setCalculateUnit(this.calculateUnit);
 		result.setMin(this.fullElement);
 		return result;
 	}
@@ -58,10 +55,11 @@ public class Condition {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("qrCode =").append(qrCode).append("; fullElement=").append(this.fullElement).append(";");
+		builder.append(this.calculateUnit.toString());
 
-		if (this.calculateUnitSet != null) {
+		if (this.calculateUnit.getCalculateUnits() != null) {
 			builder.append("\n");
-			this.calculateUnitSet.forEach(unit -> builder.append(unit.toString()).append("\n"));
+			this.calculateUnit.getCalculateUnits().forEach(unit -> builder.append(unit.toString()).append("\n"));
 		}
 
 		return builder.toString();

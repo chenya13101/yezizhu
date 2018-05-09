@@ -1,7 +1,7 @@
 package com.vincent.workflow;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.vincent.bean.CalculateUnit;
@@ -37,11 +37,18 @@ public class WorkFlow {
 				condition.setFullElement(coupon.getFullElement());
 				condition.setQrCode(coupon.getCode());
 
-				Set<CalculateUnit> calculateUnitSet = calculateUnits.stream()
+				List<CalculateUnit> calculateUnitList = calculateUnits.stream()
 						.filter(unit -> coupon.getFilterRule().checkInRange(unit.getProductCode()))
-						.collect(Collectors.toSet());
-				// TODO 这里整合成一个 AB而不是A+B
-				condition.setCalculateUnitSet(calculateUnitSet);
+						.collect(Collectors.toList());
+
+				CalculateUnit newUnit = new CalculateUnit();
+				newUnit.setCalculateUnits(calculateUnitList);
+				newUnit.setMin(coupon.getFullElement());
+				newUnit.setCurrentValue(calculateUnitList.stream().map(unit -> unit.getCurrentValue())
+						.reduce(BigDecimal.ZERO, BigDecimal::add));
+
+				// 这里整合成一个 AB而不是A+B
+				condition.setCalculateUnit(newUnit);
 				step.setCondition(condition);
 			}
 			step.setCoupon(coupon);

@@ -33,7 +33,10 @@ public class CalculateUnit {
 	}
 
 	public BigDecimal getCurrentValue() {
-		return currentValue;
+		if (calculateUnits == null || calculateUnits.size() == 0) {
+			return this.currentValue;
+		}
+		return calculateUnits.stream().map(unit -> unit.getCurrentValue()).reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	public void setCurrentValue(BigDecimal currentValue) {

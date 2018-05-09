@@ -1,7 +1,9 @@
 package com.vincent.common;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.vincent.bean.CalculateUnit;
 
@@ -14,7 +16,7 @@ public class ResultMessage {
 	// TODO method 和 min是不是只要有一个就够了
 	private BigDecimal min;
 
-	private Set<CalculateUnit> unitSet;
+	private CalculateUnit calculateUnit;
 
 	public ResultMessage() {
 
@@ -40,12 +42,18 @@ public class ResultMessage {
 		this.method = method;
 	}
 
-	public Set<CalculateUnit> getUnitSet() {
-		return unitSet;
+	public List<CalculateUnit> getCalculateUnits() {
+		if (this.calculateUnit.getCalculateUnits() == null || this.calculateUnit.getCalculateUnits().size() == 0) {
+			return Arrays.asList(this.calculateUnit);
+		}
+		List<CalculateUnit> result = new ArrayList<>();
+		result.add(this.calculateUnit);
+		result.addAll(this.calculateUnit.getCalculateUnits());
+		return result;
 	}
 
-	public void setUnitSet(Set<CalculateUnit> unitSet) {
-		this.unitSet = unitSet;
+	public void setCalculateUnit(CalculateUnit calculateUnit) {
+		this.calculateUnit = calculateUnit;
 	}
 
 	public BigDecimal getMin() {

@@ -123,7 +123,8 @@ public class WorkStep {
 
 		System.out.println("处理next传递来的修改请求");
 
-		Set<CalculateUnit> nextUnits = result.getUnitSet();
+		List<CalculateUnit> nextUnits = result.getCalculateUnits();
+
 		Set<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
 				.collect(Collectors.toSet());
 		if (sameUnitSet != null && sameUnitSet.size() > 0) {
@@ -152,15 +153,16 @@ public class WorkStep {
 
 	private ResultMessage specialDistribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam,
 			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
-		// TODO Auto-generated method stub
-		return null;
+		ResultMessage result = new ResultMessage();
+		result.setResultCode(ResultCode.FAIL);
+		return result;
 	}
 
 	private ResultMessage specialDiscount(BigDecimal discount, List<CalculateUnit> calculateUnitsParam,
 			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
-		// TODO Auto-generated method stub
-		return null;
-
+		ResultMessage result = new ResultMessage();
+		result.setResultCode(ResultCode.FAIL);
+		return result;
 	}
 
 	public void run() {
@@ -208,7 +210,7 @@ public class WorkStep {
 
 	private void printFailMessage(ResultMessage result) {
 		System.out.println("平摊失败: 需要[" + result.getMethod() + "] min=" + result.getMin());
-		result.getUnitSet().forEach(System.out::println);
+		result.getCalculateUnits().forEach(System.out::println);
 	}
 
 	private void printUnits() {
