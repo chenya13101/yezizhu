@@ -157,10 +157,9 @@ public class WorkStep implements Comparable<WorkStep> {
 			CouponTypeEnum typeEnum = coupon.getCouponTypeEnum();
 			switch (typeEnum) {
 			case DISCOUNT:
-				// FIXME 似乎不应该出现这种对象，而应该用unit =A+B来处理
 				return reDiscount(coupon.getDiscount(), sameUnitSet, result.getCalculateUnit());
 			case CASH:
-				return reDistribute(coupon.getAmount(), calculateUnits, sameUnitSet);
+				return reDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getCalculateUnit());
 			default:
 				break;
 			}
@@ -168,11 +167,49 @@ public class WorkStep implements Comparable<WorkStep> {
 		return new ResultMessage(ResultCode.SUCCESS);
 	}
 
+	/**
+	 * 
+	 * @param amount
+	 * @param calculateUnitsParam
+	 * @param sameUnitSet
+	 * @param checkCalculateUnit
+	 *            要求满足的计算单元
+	 * @return
+	 */
 	private ResultMessage reDistribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam,
-			List<CalculateUnit> sameUnitSet) {
+			List<CalculateUnit> containedUnitList, CalculateUnit checkCalculateUnit) {
 		ResultMessage result = new ResultMessage();
+		recoverCalculateUnits(calculateUnitsParam);
+		BigDecimal sameUnitCurrentValueSum = containedUnitList.stream().map(unit -> unit.getCurrentValue())
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		if (checkCalculateUnit.getMin() == null) {
+			throw new RuntimeException("似乎有问题啊");
+		}
+		if (checkCalculateUnit.getMin().compareTo(sameUnitCurrentValueSum) == 0) {
+			// 计算其他的计算单元的current之和
+			List<CalculateUnit> otherUnits = new ArrayList<>(calculateUnitsParam);
+			otherUnits.removeAll(containedUnitList);// 减去非本步骤包含的当前值
+			BigDecimal othersCurrentTotal = otherUnits.stream().map(unit -> unit.getCurrentValue())
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+			if (othersCurrentTotal.compareTo(checkCalculateUnit.getMin()) < 0) {
+				result.setResultCode(ResultCode.FAIL);
+				return result;
+			}
+			reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
+			result.setResultCode(ResultCode.SUCCESS);
+			return result;
+		}
+
 		result.setResultCode(ResultCode.FAIL);
 		return result;
+	}
+
+	private void reDistributeToOtherUnits(BigDecimal amount, List<CalculateUnit> otherUnits,
+			CalculateUnit checkCalculateUnit) {
+		distribute(amount, otherUnits);
+		checkCalculateUnit.setCurrentValue(checkCalculateUnit.getCurrentValue(), this);
+		System.out.println("reDistributeToOtherUnits结束");
 	}
 
 	/**
@@ -249,6 +286,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		});
 	}
 
+	// TODO 未来可以引申为排除多个元素
 	private List<CalculateUnit> reDiscountByRemoveOneUnit(BigDecimal discount, List<CalculateUnit> containedUnitList,
 			BigDecimal minAfterDiscount) {
 		BigDecimal afterDiscount;
