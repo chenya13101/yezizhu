@@ -2,6 +2,8 @@ package com.vincent.workflow;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +16,8 @@ import com.vincent.common.ResultCode;
 import com.vincent.common.ResultMessage;
 
 public class WorkStep {
+
+	private String name;
 
 	private final BigDecimal ten = new BigDecimal(10);
 
@@ -92,6 +96,7 @@ public class WorkStep {
 		calculateUnits2.forEach(unit -> {
 			unit.setCurrentValue(
 					unit.getCurrentValue().multiply(discount).divide(ten, numsAfterPoint, RoundingMode.HALF_UP));
+			unit.saveStepChangeValue(this, unit.getCurrentValue());
 		});
 	}
 
@@ -112,7 +117,19 @@ public class WorkStep {
 			} else {
 				unit.setCurrentValue(unit.getCurrentValue().subtract(amount.subtract(previousAmountTotal)));
 			}
+			unit.saveStepChangeValue(this, unit.getCurrentValue());
 		}
+	}
+
+	private List<CalculateUnit> getAllCalculateUnitsFromOne(CalculateUnit calculateUnit) {
+		if (calculateUnit.getCalculateUnits() == null || calculateUnit.getCalculateUnits().size() == 0) {
+			return Arrays.asList(calculateUnit);
+		}
+		List<CalculateUnit> result = new ArrayList<>();
+		result.add(calculateUnit);
+		result.addAll(calculateUnit.getCalculateUnits());
+		return result;
+
 	}
 
 	private ResultMessage dealFailMessageFromNextStep(ResultMessage result) {
@@ -123,8 +140,7 @@ public class WorkStep {
 
 		System.out.println("处理next传递来的修改请求");
 
-		List<CalculateUnit> nextUnits = result.getCalculateUnits();
-
+		List<CalculateUnit> nextUnits = getAllCalculateUnitsFromOne(result.getCalculateUnit());
 		Set<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
 				.collect(Collectors.toSet());
 		if (sameUnitSet != null && sameUnitSet.size() > 0) {
@@ -158,6 +174,18 @@ public class WorkStep {
 		return result;
 	}
 
+	/**
+	 * 根据折扣再平摊
+	 * 
+	 * @param discount
+	 * @param calculateUnitsParam
+	 *            全部的单元
+	 * @param sameUnitSet
+	 *            相同的单元
+	 * @param min
+	 *            最小值
+	 * @return
+	 */
 	private ResultMessage specialDiscount(BigDecimal discount, List<CalculateUnit> calculateUnitsParam,
 			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
 		ResultMessage result = new ResultMessage();
@@ -210,11 +238,20 @@ public class WorkStep {
 
 	private void printFailMessage(ResultMessage result) {
 		System.out.println("平摊失败: 需要[" + result.getMethod() + "] min=" + result.getMin());
-		result.getCalculateUnits().forEach(System.out::println);
+		System.out.println(result.getCalculateUnit());
 	}
 
 	private void printUnits() {
 		System.out.println("success:");
 		calculateUnits.forEach(unit -> System.out.println(unit));
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 }

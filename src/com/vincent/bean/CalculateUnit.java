@@ -2,6 +2,9 @@ package com.vincent.bean;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.TreeMap;
+
+import com.vincent.workflow.WorkStep;
 
 public class CalculateUnit {
 
@@ -11,6 +14,11 @@ public class CalculateUnit {
 	private BigDecimal min;
 
 	private BigDecimal currentValue;
+
+	/**
+	 * 上一个步骤保留的值 TODO 有可能需要一个map记录每一个步骤的更改
+	 */
+	private TreeMap<WorkStep, BigDecimal> previousStepVauleMap = new TreeMap<>();
 
 	private String productCode;
 
@@ -59,11 +67,28 @@ public class CalculateUnit {
 		this.productCode = productCode;
 	}
 
+	public TreeMap<WorkStep, BigDecimal> getPreviousStepVauleMap() {
+		return previousStepVauleMap;
+	}
+
+	public void setPreviousStepVauleMap(TreeMap<WorkStep, BigDecimal> previousStepVauleMap) {
+		this.previousStepVauleMap = previousStepVauleMap;
+	}
+
+	// TODO 期待这个方法能够发挥作用
+	public void saveStepChangeValue(WorkStep step, BigDecimal value) {
+		previousStepVauleMap.put(step, value);
+		if (previousStepVauleMap.size() > 1 && previousStepVauleMap.lastKey() != step) {
+			previousStepVauleMap = new TreeMap<>(
+					previousStepVauleMap.subMap(previousStepVauleMap.firstKey(), true, step, true));
+		}
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("max =").append(max).append("; min=").append(this.min).append("; current = ")
-				.append(this.currentValue).append("; productCode = ").append(this.productCode);
+				.append(this.getCurrentValue()).append("; productCode = ").append(this.productCode);
 		if (this.calculateUnits != null) {
 			builder.append("\n");
 			this.calculateUnits.forEach(unit -> builder.append(unit.toString()).append("\n"));
@@ -71,4 +96,5 @@ public class CalculateUnit {
 
 		return builder.toString();
 	}
+
 }

@@ -57,11 +57,13 @@ public class WorkFlow {
 		}).collect(Collectors.toList());
 
 		WorkStep previous = null;
+		int i = 0;
 		for (WorkStep step : steps) {
 			if (previous == null) {
 				previous = step;
 				continue;
 			}
+			step.setName("step" + i++);
 			step.setPreviousStep(previous);
 			previous.setNextStep(step);
 		}

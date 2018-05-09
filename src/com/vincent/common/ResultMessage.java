@@ -1,9 +1,6 @@
 package com.vincent.common;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import com.vincent.bean.CalculateUnit;
 
@@ -42,14 +39,8 @@ public class ResultMessage {
 		this.method = method;
 	}
 
-	public List<CalculateUnit> getCalculateUnits() {
-		if (this.calculateUnit.getCalculateUnits() == null || this.calculateUnit.getCalculateUnits().size() == 0) {
-			return Arrays.asList(this.calculateUnit);
-		}
-		List<CalculateUnit> result = new ArrayList<>();
-		result.add(this.calculateUnit);
-		result.addAll(this.calculateUnit.getCalculateUnits());
-		return result;
+	public CalculateUnit getCalculateUnit() {
+		return this.calculateUnit;
 	}
 
 	public void setCalculateUnit(CalculateUnit calculateUnit) {
