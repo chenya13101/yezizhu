@@ -292,7 +292,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			case SUCCESS:
 				// TODO 那么应该继续执行下一步，而不是放弃.
 				// TODO 所有步骤，都应该检验一下是否有计算单元的值是由之后步骤产生的，避免引起混淆
-				System.out.println("上一步骤处理成功，请开始这一步的业务逻辑");
+				run();
 				break;
 			case FAIL_END:
 			case FAIL:

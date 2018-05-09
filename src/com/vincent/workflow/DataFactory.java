@@ -16,7 +16,7 @@ public class DataFactory {
 				(input) -> input != null && (input.indexOf("a") > -1 || input.indexOf("c") > -1));
 		list.add(c1);
 
-		Coupon c2 = new Coupon("A002", CouponTypeEnum.CASH, null, new BigDecimal(8.5), new BigDecimal(40),
+		Coupon c2 = new Coupon("A002", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(40),
 				(input) -> input != null && (input.indexOf("coffee") > -1 || input.indexOf("p") > -1));
 		list.add(c2);
 		return list;
