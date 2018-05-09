@@ -26,10 +26,10 @@ public class DataFactory {
 
 	public static List<Product> getProducts() {
 		List<Product> list = new ArrayList<>();
-		Product p1 = new Product("apple", new BigDecimal(31));
+		Product p1 = new Product("apple", new BigDecimal(34));
 		list.add(p1);
 
-		Product p2 = new Product("coffee", new BigDecimal(80));
+		Product p2 = new Product("coffee", new BigDecimal(50));
 		list.add(p2);
 		return list;
 	}

@@ -21,6 +21,12 @@ public class WorkFlow {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
+		workFlow.showResult(calculateUnits);
+	}
+
+	private void showResult(List<CalculateUnit> calculateUnits) {
+		System.out.println("最终结果:");
+		calculateUnits.forEach(System.out::println);
 	}
 
 	private void start(List<WorkStep> steps) {

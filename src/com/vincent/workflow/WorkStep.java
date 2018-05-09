@@ -380,12 +380,12 @@ public class WorkStep implements Comparable<WorkStep> {
 	}
 
 	private void printUnits(List<CalculateUnit> otherUnits) {
-		System.out.println("success:");
+		System.out.println(this.getName() + " success:");
 		otherUnits.forEach(unit -> System.out.println(unit));
 	}
 
 	private void printCurrentStepUnits() {
-		System.out.println("success:");
+		System.out.println(this.getName() + " success:");
 		calculateUnits.forEach(unit -> System.out.println(unit));
 	}
 
