@@ -15,7 +15,7 @@ import com.vincent.bean.CouponTypeEnum;
 import com.vincent.common.ResultCode;
 import com.vincent.common.ResultMessage;
 
-public class WorkStep {
+public class WorkStep implements Comparable<WorkStep> {
 
 	private String name;
 
@@ -138,7 +138,7 @@ public class WorkStep {
 			return new ResultMessage(ResultCode.FAIL_END);
 		}
 
-		System.out.println("处理next传递来的修改请求");
+		System.out.println(this.getName() + ":处理next传递来的修改请求");
 
 		List<CalculateUnit> nextUnits = getAllCalculateUnitsFromOne(result.getCalculateUnit());
 		Set<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
@@ -218,7 +218,7 @@ public class WorkStep {
 				break;
 			case FAIL_END:
 			case FAIL:
-				System.out.println("上一步骤处理失败,结束流程");
+				System.out.println(this.getName() + ":上一步骤[" + previousStep.getName() + "]处理失败,结束流程");
 				break;
 			default:
 				break;
@@ -254,4 +254,8 @@ public class WorkStep {
 		this.name = name;
 	}
 
+	@Override
+	public int compareTo(WorkStep o) {
+		return this.getName().compareTo(o.getName());
+	}
 }

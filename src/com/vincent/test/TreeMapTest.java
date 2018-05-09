@@ -3,7 +3,7 @@ package com.vincent.test;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Test {
+public class TreeMapTest {
 	public static void main(String[] args) {
 		TreeMap<String, Integer> stepVauleMap = new TreeMap<>();
 		stepVauleMap.put("a", 1);
