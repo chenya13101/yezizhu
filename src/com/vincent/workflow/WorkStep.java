@@ -184,9 +184,10 @@ public class WorkStep implements Comparable<WorkStep> {
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 
 		if (checkCalculateUnit.getMin() == null) {
-			throw new RuntimeException("似乎有问题啊");
+			throw new RuntimeException("怎么会出现空?");
 		}
-		if (checkCalculateUnit.getMin().compareTo(sameUnitCurrentValueSum) == 0) {
+		int compareValue = sameUnitCurrentValueSum.compareTo(checkCalculateUnit.getMin());
+		if (compareValue == 0) {
 			// 计算其他的计算单元的current之和
 			List<CalculateUnit> otherUnits = new ArrayList<>(calculateUnitsParam);
 			otherUnits.removeAll(containedUnitList);// 减去非本步骤包含的当前值
@@ -198,6 +199,27 @@ public class WorkStep implements Comparable<WorkStep> {
 			}
 			reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
 			result.setResultCode(ResultCode.SUCCESS);
+			return result;
+		} else if (compareValue > 0) {
+			// 是不是相同的商品可以部分参与代金券的使用
+			List<CalculateUnit> otherUnits = new ArrayList<>(calculateUnitsParam);
+			otherUnits.removeAll(containedUnitList);// 减去非本步骤包含的当前值
+			BigDecimal othersCurrentTotal = otherUnits.stream().map(unit -> unit.getCurrentValue())
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+			int compareValue2 = othersCurrentTotal.compareTo(checkCalculateUnit.getMin());
+			if (compareValue2 < 0) {
+				// TODO 那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败
+			} else {
+				// if (compareValue2 >= 0)
+				// TODO 先不管其它步骤的处理，以及如何循环更改，直接让其它的计算单元平摊
+				reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
+				printUnits(otherUnits);
+
+				result.setResultCode(ResultCode.SUCCESS);
+				return result;
+			}
+		} else {
+			result.setResultCode(ResultCode.FAIL);
 			return result;
 		}
 
@@ -312,7 +334,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		switch (result.getResultCode()) {
 		case SUCCESS:
 			this.work();
-			printUnits();
+			printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();
 			}
@@ -357,7 +379,12 @@ public class WorkStep implements Comparable<WorkStep> {
 		System.out.println(result.getCalculateUnit());
 	}
 
-	private void printUnits() {
+	private void printUnits(List<CalculateUnit> otherUnits) {
+		System.out.println("success:");
+		otherUnits.forEach(unit -> System.out.println(unit));
+	}
+
+	private void printCurrentStepUnits() {
 		System.out.println("success:");
 		calculateUnits.forEach(unit -> System.out.println(unit));
 	}

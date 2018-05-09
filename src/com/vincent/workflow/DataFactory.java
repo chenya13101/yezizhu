@@ -13,21 +13,23 @@ public class DataFactory {
 	public static List<Coupon> getCoupons() {
 		List<Coupon> list = new ArrayList<>();
 		Coupon c1 = new Coupon("A001", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
-				(input) -> input != null && (input.indexOf("a") > -1 || input.indexOf("c") > -1));
+				(unit) -> unit.getProductCode() != null
+						&& (unit.getProductCode().indexOf("a") > -1 || unit.getProductCode().indexOf("c") > -1));
 		list.add(c1);
 
 		Coupon c2 = new Coupon("A002", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(30),
-				(input) -> input != null && (input.indexOf("apple") > -1));// || input.indexOf("p") > -1
+				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("apple") > -1));
+		// ||input.indexOf("p") > -1
 		list.add(c2);
 		return list;
 	}
 
 	public static List<Product> getProducts() {
 		List<Product> list = new ArrayList<>();
-		Product p1 = new Product("apple", new BigDecimal(30));
+		Product p1 = new Product("apple", new BigDecimal(31));
 		list.add(p1);
 
-		Product p2 = new Product("coffee", new BigDecimal(100));
+		Product p2 = new Product("coffee", new BigDecimal(80));
 		list.add(p2);
 		return list;
 	}

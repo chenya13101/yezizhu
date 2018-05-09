@@ -30,16 +30,17 @@ public class WorkFlow {
 	private List<WorkStep> createWorkSteps(List<Coupon> couponList, List<CalculateUnit> calculateUnits) {
 		List<WorkStep> steps = couponList.stream().map(coupon -> {
 			WorkStep step = new WorkStep();
-			step.setCalculateUnits(calculateUnits);
+
+			// 要根据规则过滤
+			step.setCalculateUnits(calculateUnits.stream().filter(coupon.getFilterRule()).collect(Collectors.toList()));
+
 			if (coupon.getFullElement() != null) {
 				Condition condition = new Condition();
 				condition.setFullElement(coupon.getFullElement());
 				condition.setQrCode(coupon.getCode());
 
-				List<CalculateUnit> calculateUnitList = calculateUnits.stream()
-						.filter(unit -> coupon.getFilterRule().checkInRange(unit.getProductCode()))
+				List<CalculateUnit> calculateUnitList = calculateUnits.stream().filter(coupon.getFilterRule())
 						.collect(Collectors.toList());
-
 				CalculateUnit newUnit = new CalculateUnit();
 				newUnit.setCalculateUnits(calculateUnitList);
 				newUnit.setMin(coupon.getFullElement());

@@ -1,6 +1,7 @@
 package com.vincent.bean;
 
 import java.math.BigDecimal;
+import java.util.function.Predicate;
 
 public class Coupon {
 
@@ -14,10 +15,10 @@ public class Coupon {
 
 	private BigDecimal fullElement;
 
-	private FilterRule filterRule;
+	private Predicate<CalculateUnit> filterRule;
 
 	public Coupon(String code, CouponTypeEnum couponTypeEnum, BigDecimal discount, BigDecimal amount,
-			BigDecimal fullElement, FilterRule filterRule) {
+			BigDecimal fullElement, Predicate<CalculateUnit> filterRule) {
 		super();
 		this.code = code;
 		this.couponTypeEnum = couponTypeEnum;
@@ -67,11 +68,11 @@ public class Coupon {
 		this.fullElement = fullElement;
 	}
 
-	public FilterRule getFilterRule() {
+	public Predicate<CalculateUnit> getFilterRule() {
 		return filterRule;
 	}
 
-	public void setFilterRule(FilterRule filterRule) {
+	public void setFilterRule(Predicate<CalculateUnit> filterRule) {
 		this.filterRule = filterRule;
 	}
 

@@ -9,7 +9,7 @@ import com.vincent.workflow.WorkStep;
 
 public class CalculateUnit {
 
-	// TODO 有没有必要保存修改之前的值
+	// TODO 有没有必要保存修改之前的值 beforeValue
 	private BigDecimal max;
 
 	private BigDecimal min;
