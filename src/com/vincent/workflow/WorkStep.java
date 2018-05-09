@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.vincent.bean.CalculateUnit;
@@ -141,8 +140,8 @@ public class WorkStep implements Comparable<WorkStep> {
 		System.out.println(this.getName() + ":处理next传递来的修改请求");
 
 		List<CalculateUnit> nextUnits = getAllCalculateUnitsFromOne(result.getCalculateUnit());
-		Set<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
-				.collect(Collectors.toSet());
+		List<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
+				.collect(Collectors.toList());
 		if (sameUnitSet != null && sameUnitSet.size() > 0) {
 			if (this.calculateUnits.size() == 1) {
 				if (previousStep != null) {
@@ -157,9 +156,9 @@ public class WorkStep implements Comparable<WorkStep> {
 			switch (typeEnum) {
 			case DISCOUNT:
 				// FIXME 似乎不应该出现这种对象，而应该用unit =A+B来处理
-				return specialDiscount(coupon.getDiscount(), calculateUnits, sameUnitSet, result.getMin());
+				return reDiscount(coupon.getDiscount(), sameUnitSet, result.getCalculateUnit());
 			case CASH:
-				return specialDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getMin());
+				return reDistribute(coupon.getAmount(), calculateUnits, sameUnitSet);
 			default:
 				break;
 			}
@@ -167,28 +166,43 @@ public class WorkStep implements Comparable<WorkStep> {
 		return new ResultMessage(ResultCode.SUCCESS);
 	}
 
-	private ResultMessage specialDistribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam,
-			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
+	private ResultMessage reDistribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam,
+			List<CalculateUnit> sameUnitSet) {
 		ResultMessage result = new ResultMessage();
 		result.setResultCode(ResultCode.FAIL);
 		return result;
 	}
 
 	/**
+	 * 还原成上一步骤处理过之后的数据
+	 * 
+	 * @param containedUnitList
+	 * @return
+	 */
+	private List<CalculateUnit> recoverCalculateUnit(List<CalculateUnit> containedUnitList) {
+		WorkStep previous = this.previousStep;
+		containedUnitList.forEach(unit -> unit.recover(previous));
+		return containedUnitList;
+	}
+
+	/**
 	 * 根据折扣再平摊
 	 * 
 	 * @param discount
-	 * @param calculateUnitsParam
-	 *            全部的单元
-	 * @param sameUnitSet
-	 *            相同的单元
-	 * @param min
-	 *            最小值
-	 * @return
+	 *            折扣率
+	 * @param containedUnitSet
+	 *            本步骤内包含的单元，一定是单数据单元
+	 * @param checkCalculateUnits
+	 *            可能是单数据单元或复合单元
+	 * @return 计算结果
 	 */
-	private ResultMessage specialDiscount(BigDecimal discount, List<CalculateUnit> calculateUnitsParam,
-			Set<CalculateUnit> sameUnitSet, BigDecimal min) {
+	private ResultMessage reDiscount(BigDecimal discount, List<CalculateUnit> containedUnitList,
+			CalculateUnit checkCalculateUnits) {
 		ResultMessage result = new ResultMessage();
+		recoverCalculateUnit(containedUnitList);
+		containedUnitList.stream().sorted((unit1, unit2) -> unit2.getCurrentValue().compareTo(unit1.getCurrentValue()));
+		// 本步骤内有的计算单元，折扣一下，试试看怎么样才能满足组合
+
 		result.setResultCode(ResultCode.FAIL);
 		return result;
 	}
@@ -237,7 +251,7 @@ public class WorkStep implements Comparable<WorkStep> {
 	}
 
 	private void printFailMessage(ResultMessage result) {
-		System.out.println("平摊失败: 需要[" + result.getMethod() + "] min=" + result.getMin());
+		System.out.println("平摊失败: 需要" + result.getMethod() + "");
 		System.out.println(result.getCalculateUnit());
 	}
 

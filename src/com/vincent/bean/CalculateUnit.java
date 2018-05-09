@@ -97,4 +97,17 @@ public class CalculateUnit {
 		return builder.toString();
 	}
 
+	public void recover(WorkStep previous) {
+		if (previous == null) {
+			this.setCurrentValue(this.getMax());
+			return;
+		}
+
+		this.setCurrentValue(this.getPreviousStepVauleMap().get(previous));
+		if (previousStepVauleMap.size() > 1 && previousStepVauleMap.lastKey() != previous) {
+			previousStepVauleMap = new TreeMap<>(
+					previousStepVauleMap.subMap(previousStepVauleMap.firstKey(), true, previous, true));
+		}
+	}
+
 }

@@ -47,7 +47,6 @@ public class Condition {
 		result.setResultCode(ResultCode.FAIL);
 		result.setMethod(MathMethod.ADD);
 		result.setCalculateUnit(this.calculateUnit);
-		result.setMin(this.fullElement);
 		return result;
 	}
 
