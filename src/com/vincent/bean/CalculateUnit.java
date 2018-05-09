@@ -2,6 +2,7 @@ package com.vincent.bean;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.vincent.workflow.WorkStep;
@@ -16,7 +17,7 @@ public class CalculateUnit {
 	private BigDecimal currentValue;
 
 	/**
-	 * 上一个步骤保留的值 TODO 有可能需要一个map记录每一个步骤的更改
+	 * 上一个步骤保留的值 ,map记录每一个步骤的更改
 	 */
 	private TreeMap<WorkStep, BigDecimal> previousStepVauleMap = new TreeMap<>();
 
@@ -30,6 +31,7 @@ public class CalculateUnit {
 
 	public void setMax(BigDecimal max) {
 		this.max = max;
+		this.currentValue = max.add(BigDecimal.ZERO);
 	}
 
 	public BigDecimal getMin() {
@@ -47,7 +49,12 @@ public class CalculateUnit {
 		return calculateUnits.stream().map(unit -> unit.getCurrentValue()).reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	public void setCurrentValue(BigDecimal currentValue) {
+	public void setCurrentValue(BigDecimal currentValue, WorkStep step) {
+		this.currentValue = currentValue;
+		this.getPreviousStepVauleMap().put(step, currentValue);
+	}
+
+	private void setCurrentValue(BigDecimal currentValue) {
 		this.currentValue = currentValue;
 	}
 
@@ -57,6 +64,8 @@ public class CalculateUnit {
 
 	public void setCalculateUnits(List<CalculateUnit> calculateUnits) {
 		this.calculateUnits = calculateUnits;
+		this.setCurrentValue(this.calculateUnits.stream().map(unit -> unit.getCurrentValue()).reduce(BigDecimal.ZERO,
+				BigDecimal::add));
 	}
 
 	public String getProductCode() {
@@ -103,7 +112,20 @@ public class CalculateUnit {
 			return;
 		}
 
-		this.setCurrentValue(this.getPreviousStepVauleMap().get(previous));
+		// 有可能上一步并没有更改，那么应该一直往前走，直到找到或者到第一步替换为max
+		BigDecimal previousValue = this.getPreviousStepVauleMap().get(previous);
+		if (previousValue != null) {
+			this.setCurrentValue(previousValue);
+		} else {
+			// 找到上一个步骤
+			Entry<WorkStep, BigDecimal> entry = this.getPreviousStepVauleMap().lowerEntry(previous);
+			if (entry == null) {
+				this.setCurrentValue(this.getMax());
+			} else {
+				this.setCurrentValue(entry.getValue());
+			}
+		}
+
 		if (previousStepVauleMap.size() > 1 && previousStepVauleMap.lastKey() != previous) {
 			previousStepVauleMap = new TreeMap<>(
 					previousStepVauleMap.subMap(previousStepVauleMap.firstKey(), true, previous, true));

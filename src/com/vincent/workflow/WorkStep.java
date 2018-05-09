@@ -18,9 +18,9 @@ public class WorkStep implements Comparable<WorkStep> {
 
 	private String name;
 
-	private final BigDecimal ten = new BigDecimal(10);
+	private final static BigDecimal TEN = new BigDecimal(10);
 
-	private final int numsAfterPoint = 4;
+	private final static int NUMS_AFTER_POINT = 4;
 
 	private Condition condition;
 
@@ -94,7 +94,8 @@ public class WorkStep implements Comparable<WorkStep> {
 	private void discount(BigDecimal discount, List<CalculateUnit> calculateUnits2) {
 		calculateUnits2.forEach(unit -> {
 			unit.setCurrentValue(
-					unit.getCurrentValue().multiply(discount).divide(ten, numsAfterPoint, RoundingMode.HALF_UP));
+					unit.getCurrentValue().multiply(discount).divide(TEN, NUMS_AFTER_POINT, RoundingMode.HALF_UP),
+					this);
 			unit.saveStepChangeValue(this, unit.getCurrentValue());
 		});
 	}
@@ -110,11 +111,12 @@ public class WorkStep implements Comparable<WorkStep> {
 		for (int i = 0; i < calculateUnitsParam.size(); i++) {
 			unit = calculateUnitsParam.get(i);
 			if (i != calculateUnitsParam.size() - 1) {
-				tmpReduce = unit.getCurrentValue().multiply(amount).divide(total, numsAfterPoint, RoundingMode.HALF_UP);
-				unit.setCurrentValue(unit.getCurrentValue().subtract(tmpReduce));
+				tmpReduce = unit.getCurrentValue().multiply(amount).divide(total, NUMS_AFTER_POINT,
+						RoundingMode.HALF_UP);
+				unit.setCurrentValue(unit.getCurrentValue().subtract(tmpReduce), this);
 				previousAmountTotal = previousAmountTotal.add(tmpReduce);
 			} else {
-				unit.setCurrentValue(unit.getCurrentValue().subtract(amount.subtract(previousAmountTotal)));
+				unit.setCurrentValue(unit.getCurrentValue().subtract(amount.subtract(previousAmountTotal)), this);
 			}
 			unit.saveStepChangeValue(this, unit.getCurrentValue());
 		}
@@ -179,10 +181,8 @@ public class WorkStep implements Comparable<WorkStep> {
 	 * @param containedUnitList
 	 * @return
 	 */
-	private List<CalculateUnit> recoverCalculateUnit(List<CalculateUnit> containedUnitList) {
-		WorkStep previous = this.previousStep;
-		containedUnitList.forEach(unit -> unit.recover(previous));
-		return containedUnitList;
+	private void recoverCalculateUnits(List<CalculateUnit> containedUnitList) {
+		containedUnitList.forEach(unit -> unit.recover(this.previousStep));
 	}
 
 	/**
@@ -197,14 +197,76 @@ public class WorkStep implements Comparable<WorkStep> {
 	 * @return 计算结果
 	 */
 	private ResultMessage reDiscount(BigDecimal discount, List<CalculateUnit> containedUnitList,
-			CalculateUnit checkCalculateUnits) {
+			CalculateUnit checkCalculateUnit) {
 		ResultMessage result = new ResultMessage();
-		recoverCalculateUnit(containedUnitList);
-		containedUnitList.stream().sorted((unit1, unit2) -> unit2.getCurrentValue().compareTo(unit1.getCurrentValue()));
+		if (checkCalculateUnit.getCalculateUnits() == null || checkCalculateUnit.getCalculateUnits().size() == 0) {
+			result.setResultCode(ResultCode.FAIL_END);
+			return result;
+		}
+
+		recoverCalculateUnits(containedUnitList);
+		List<CalculateUnit> sortedUnitList = containedUnitList.stream()
+				.sorted((unit1, unit2) -> unit1.getCurrentValue().compareTo(unit2.getCurrentValue()))
+				.collect(Collectors.toList());
 		// 本步骤内有的计算单元，折扣一下，试试看怎么样才能满足组合
+
+		BigDecimal totalMin = checkCalculateUnit.getMin(); // 该符合计算单元最低要求
+		List<CalculateUnit> checkUnitAllUnits = new ArrayList<>(checkCalculateUnit.getCalculateUnits());
+		checkUnitAllUnits.removeAll(containedUnitList);// 减去非本步骤包含的当前值
+		BigDecimal othersCurrentTotal = checkUnitAllUnits.stream().map(unit -> unit.getCurrentValue())
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal minAfterDiscount = totalMin.subtract(othersCurrentTotal);
+
+		// BigDecimal minSum = minAfterDiscount.multiply(TEN).divide(discount,
+		// NUMS_AFTER_POINT, RoundingMode.HALF_UP);// 最低要求
+
+		BigDecimal allCurrentValueSum = containedUnitList.stream().map(unit -> unit.getCurrentValue())
+				.reduce(BigDecimal.ZERO, BigDecimal::add);// currentValue之和的最大值
+		if (allCurrentValueSum.compareTo(minAfterDiscount) < 0) {
+			result.setResultCode(ResultCode.FAIL);
+			return result;
+		}
+		// 只要某个值不折扣时
+		List<CalculateUnit> excludeList = reDiscountByRemoveOneUnit(discount, sortedUnitList, minAfterDiscount);
+		if (excludeList != null && excludeList.size() > 0) {
+			reDiscountExcludeIndexArray(discount, sortedUnitList, excludeList);
+			result.setResultCode(ResultCode.SUCCESS);
+			return result;
+		}
 
 		result.setResultCode(ResultCode.FAIL);
 		return result;
+	}
+
+	private void reDiscountExcludeIndexArray(BigDecimal discount, List<CalculateUnit> sortedUnitList,
+			List<CalculateUnit> excludeList) {
+		sortedUnitList.forEach(unit -> {
+			if (!excludeList.contains(unit)) {
+				unit.setCurrentValue(
+						unit.getCurrentValue().multiply(discount).divide(TEN, NUMS_AFTER_POINT, RoundingMode.HALF_UP),
+						this);
+			}
+		});
+	}
+
+	private List<CalculateUnit> reDiscountByRemoveOneUnit(BigDecimal discount, List<CalculateUnit> containedUnitList,
+			BigDecimal minAfterDiscount) {
+		BigDecimal afterDiscount;
+		List<CalculateUnit> result = new ArrayList<>();
+		for (int i = 0; i < containedUnitList.size(); i++) {
+			final int index = i;
+			afterDiscount = containedUnitList.stream().map(unit -> {
+				if (containedUnitList.indexOf(unit) == index) {
+					return unit.getCurrentValue();
+				}
+				return unit.getCurrentValue().multiply(discount).divide(TEN, NUMS_AFTER_POINT, RoundingMode.HALF_UP);
+			}).reduce(BigDecimal.ZERO, BigDecimal::add);
+			if (afterDiscount.compareTo(minAfterDiscount) >= 0) {
+				result.add(containedUnitList.get(index));
+				return result;
+			}
+		}
+		return null;
 	}
 
 	public void run() {
@@ -228,6 +290,8 @@ public class WorkStep implements Comparable<WorkStep> {
 			ResultMessage previousResult = previousStep.dealFailMessageFromNextStep(result); // 通知之前的步骤调整
 			switch (previousResult.getResultCode()) {
 			case SUCCESS:
+				// TODO 那么应该继续执行下一步，而不是放弃.
+				// TODO 所有步骤，都应该检验一下是否有计算单元的值是由之后步骤产生的，避免引起混淆
 				System.out.println("上一步骤处理成功，请开始这一步的业务逻辑");
 				break;
 			case FAIL_END:

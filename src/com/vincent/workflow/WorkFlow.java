@@ -1,6 +1,5 @@
 package com.vincent.workflow;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +43,6 @@ public class WorkFlow {
 				CalculateUnit newUnit = new CalculateUnit();
 				newUnit.setCalculateUnits(calculateUnitList);
 				newUnit.setMin(coupon.getFullElement());
-				newUnit.setCurrentValue(calculateUnitList.stream().map(unit -> unit.getCurrentValue())
-						.reduce(BigDecimal.ZERO, BigDecimal::add));
 
 				// 这里整合成一个 AB而不是A+B
 				condition.setCalculateUnit(newUnit);
@@ -74,7 +71,6 @@ public class WorkFlow {
 		return productList.stream().map(product -> {
 			CalculateUnit unit = new CalculateUnit();
 			unit.setMax(product.getPrice());
-			unit.setCurrentValue(product.getPrice());
 			unit.setProductCode(product.getCode());
 			return unit;
 		}).collect(Collectors.toList());
