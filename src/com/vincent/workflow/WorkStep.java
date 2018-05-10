@@ -26,6 +26,8 @@ public class WorkStep implements Comparable<WorkStep> {
 
 	private List<CalculateUnit> calculateUnits;
 
+	private List<CalculateUnit> checkCalculateUnitList;
+
 	private Coupon coupon;
 
 	private WorkStep nextStep;
@@ -78,6 +80,22 @@ public class WorkStep implements Comparable<WorkStep> {
 
 	private ResultMessage check() {
 		return condition.isAvailable();
+	}
+
+	public List<CalculateUnit> getCheckCalculateUnitList() {
+		return checkCalculateUnitList;
+	}
+
+	public void setCheckCalculateUnitList(List<CalculateUnit> checkCalculateUnitList) {
+		this.checkCalculateUnitList = checkCalculateUnitList;
+	}
+
+	public static BigDecimal getTen() {
+		return TEN;
+	}
+
+	public static int getNumsAfterPoint() {
+		return NUMS_AFTER_POINT;
 	}
 
 	private void work() {
@@ -145,6 +163,7 @@ public class WorkStep implements Comparable<WorkStep> {
 
 		System.out.println(this.getName() + ":处理next传递来的修改请求");
 
+		ResultMessage dealResult = null;
 		List<CalculateUnit> nextUnits = getAllCalculateUnitsFromOne(result.getCalculateUnit());
 		List<CalculateUnit> sameUnitSet = nextUnits.stream().filter(unit -> this.getCalculateUnits().contains(unit))
 				.collect(Collectors.toList());
@@ -161,14 +180,30 @@ public class WorkStep implements Comparable<WorkStep> {
 			CouponTypeEnum typeEnum = coupon.getCouponTypeEnum();
 			switch (typeEnum) {
 			case DISCOUNT:
-				return reDiscount(coupon.getDiscount(), sameUnitSet, result.getCalculateUnit());
+				dealResult = reDiscount(coupon.getDiscount(), sameUnitSet, result.getCalculateUnit());
 			case CASH:
-				return reDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getCalculateUnit());
+				dealResult = reDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getCalculateUnit());
 			default:
 				break;
 			}
 		}
-		return new ResultMessage(ResultCode.SUCCESS);
+
+		ResultMessage previousMessage;
+		if (dealResult == null && previousStep != null) {
+			previousMessage = previousStep.dealFailMessageFromNextStep(result);
+			if (previousMessage.getResultCode() == ResultCode.SUCCESS) {
+				this.run();
+			}
+			return previousMessage;
+		}
+		if (dealResult.getResultCode() == ResultCode.FAIL && previousStep != null) {
+			previousMessage = previousStep.dealFailMessageFromNextStep(dealResult);
+			if (previousMessage.getResultCode() == ResultCode.SUCCESS) {
+				this.run();
+			}
+			return previousMessage;
+		}
+		return dealResult;
 	}
 
 	/**
@@ -199,6 +234,7 @@ public class WorkStep implements Comparable<WorkStep> {
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
 			if (othersCurrentTotal.compareTo(checkCalculateUnit.getMin()) < 0) {
 				result.setResultCode(ResultCode.FAIL);
+				result.setCalculateUnit(checkCalculateUnit);
 				return result;
 			}
 			return reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
@@ -224,6 +260,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			}
 		} else {
 			result.setResultCode(ResultCode.FAIL);
+			result.setCalculateUnit(checkCalculateUnit);
 			return result;
 		}
 
@@ -257,6 +294,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			// 再次计算平摊完是否满足 checkCalculateUnit的要求
 			recoverCalculateUnits(partContainedUnits);
 			tmpResult.setResultCode(ResultCode.FAIL);
+			tmpResult.setCalculateUnit(checkCalculateUnit);
 		}
 		return tmpResult;
 
@@ -287,6 +325,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		case FAIL:
 			printFailMessage(result);
 			// 平摊失败
+			result.setCalculateUnit(checkCalculateUnit);
 			result.setResultCode(ResultCode.FAIL);
 			return result;
 		default:
@@ -295,7 +334,6 @@ public class WorkStep implements Comparable<WorkStep> {
 
 		distribute(amount, otherUnits);
 		checkCalculateUnit.setCurrentValue(checkCalculateUnit.getCurrentValue(), this);
-		System.out.println("reDistributeToOtherUnits结束");
 		printUnits(otherUnits);
 		return result;
 	}
@@ -395,6 +433,10 @@ public class WorkStep implements Comparable<WorkStep> {
 		return null;
 	}
 
+	private void runAgain() {
+		run();
+	}
+
 	public void run() {
 		ResultMessage result = this.check();
 		switch (result.getResultCode()) {
@@ -419,8 +461,8 @@ public class WorkStep implements Comparable<WorkStep> {
 				// TODO 所有步骤，都应该检验一下是否有计算单元的值是由之后步骤产生的，避免引起混淆
 				run();// 再次执行本步骤，因为之前的步骤已经把平摊值改了
 				break;
-			case FAIL_END:
 			case FAIL:
+			case FAIL_END:
 				System.out.println(this.getName() + ":上一步骤[" + previousStep.getName() + "]处理失败,结束流程");
 				break;
 			default:

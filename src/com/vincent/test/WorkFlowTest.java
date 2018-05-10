@@ -129,6 +129,7 @@ class WorkFlowTest {
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
+		// TODO 需要做更多验证
 		assertNotEquals(new BigDecimal(80), resultSum);
 	}
 }
