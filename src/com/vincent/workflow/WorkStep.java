@@ -234,7 +234,7 @@ public class WorkStep implements Comparable<WorkStep> {
 	private ResultMessage reDistributeToOtherUnitsWithPartContainedUnits(BigDecimal amount,
 			List<CalculateUnit> otherUnits, CalculateUnit checkCalculateUnit, List<CalculateUnit> containedUnitList) {
 		// 这里不需要再次check
-		// TODO 给containedUnitList排序一下，从低到高开始参与本次的平摊
+		// 给containedUnitList排序一下，从低到高开始参与本次的平摊
 		List<CalculateUnit> sortedUnitList = containedUnitList.stream()
 				.sorted((unit1, unit2) -> unit1.getCurrentValue().compareTo(unit2.getCurrentValue()))
 				.collect(Collectors.toList());
@@ -251,8 +251,11 @@ public class WorkStep implements Comparable<WorkStep> {
 		partContainedUnits.addAll(otherUnits);
 
 		ResultMessage tmpResult = reDistributeToOtherUnits(amount, partContainedUnits, checkCalculateUnit);
+
+		// TODO 之后可以考虑返回多个对象，而不是单个
 		if (checkCalculateUnit.getCurrentValue().compareTo(checkCalculateUnit.getMin()) < 0) {
 			// 再次计算平摊完是否满足 checkCalculateUnit的要求
+			recoverCalculateUnits(partContainedUnits);
 			tmpResult.setResultCode(ResultCode.FAIL);
 		}
 		return tmpResult;
@@ -280,7 +283,6 @@ public class WorkStep implements Comparable<WorkStep> {
 		ResultMessage result = this.check(otherUnits);
 		switch (result.getResultCode()) {
 		case SUCCESS:
-			printCurrentStepUnits();
 			break;
 		case FAIL:
 			printFailMessage(result);
@@ -397,7 +399,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		ResultMessage result = this.check();
 		switch (result.getResultCode()) {
 		case SUCCESS:
-			this.work();
+			this.work(); // TODO 可以在第一步执行不满足时就直接退出
 			printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();
@@ -414,9 +416,8 @@ public class WorkStep implements Comparable<WorkStep> {
 			ResultMessage previousResult = previousStep.dealFailMessageFromNextStep(result); // 通知之前的步骤调整
 			switch (previousResult.getResultCode()) {
 			case SUCCESS:
-				// TODO 那么应该继续执行下一步，而不是放弃.
 				// TODO 所有步骤，都应该检验一下是否有计算单元的值是由之后步骤产生的，避免引起混淆
-				run();
+				run();// 再次执行本步骤，因为之前的步骤已经把平摊值改了
 				break;
 			case FAIL_END:
 			case FAIL:

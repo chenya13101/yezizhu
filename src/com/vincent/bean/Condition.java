@@ -39,7 +39,9 @@ public class Condition {
 		this.calculateUnit = calculateUnit;
 	}
 
-	// TODO
+	/**
+	 * 检验传入的计算单元current之和是否大于当前condition的fullElement
+	 */
 	public ResultMessage isAvailable(List<CalculateUnit> otherUnits) {
 		ResultMessage result = new ResultMessage();
 		if (otherUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO, BigDecimal::add)

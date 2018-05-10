@@ -42,6 +42,8 @@ public class DataFactory {
 
 		Product p4 = new Product("yapu", new BigDecimal(2));
 		list.add(p4);
+
+		// TODO 为什么在这种情况下没有回滚数据呢
 		return list;
 	}
 }
