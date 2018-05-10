@@ -399,7 +399,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		ResultMessage result = this.check();
 		switch (result.getResultCode()) {
 		case SUCCESS:
-			this.work(); // TODO 可以在第一步执行不满足时就直接退出
+			this.work();
 			printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();

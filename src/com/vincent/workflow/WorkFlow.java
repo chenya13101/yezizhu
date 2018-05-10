@@ -24,7 +24,7 @@ public class WorkFlow {
 		workFlow.showResult(calculateUnits);
 	}
 
-	private void showResult(List<CalculateUnit> calculateUnits) {
+	public void showResult(List<CalculateUnit> calculateUnits) {
 		System.out.println("最终结果:");
 		calculateUnits.forEach(System.out::println);
 	}
@@ -70,6 +70,7 @@ public class WorkFlow {
 			}
 			step.setPreviousStep(previous);
 			previous.setNextStep(step);
+			previous = step;
 		}
 		return steps;
 	}
