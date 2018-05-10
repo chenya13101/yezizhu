@@ -29,11 +29,11 @@ public class WorkFlow {
 		calculateUnits.forEach(System.out::println);
 	}
 
-	private void start(List<WorkStep> steps) {
+	public void start(List<WorkStep> steps) {
 		steps.get(0).run();
 	}
 
-	private List<WorkStep> createWorkSteps(List<Coupon> couponList, List<CalculateUnit> calculateUnits) {
+	public List<WorkStep> createWorkSteps(List<Coupon> couponList, List<CalculateUnit> calculateUnits) {
 		List<WorkStep> steps = couponList.stream().map(coupon -> {
 			WorkStep step = new WorkStep();
 
@@ -74,7 +74,7 @@ public class WorkFlow {
 		return steps;
 	}
 
-	private List<CalculateUnit> createCalculateUnits(List<Product> productList) {
+	public List<CalculateUnit> createCalculateUnits(List<Product> productList) {
 		return productList.stream().map(product -> {
 			CalculateUnit unit = new CalculateUnit();
 			unit.setMax(product.getPrice());

@@ -37,13 +37,9 @@ public class DataFactory {
 		Product p2 = new Product("coffee", new BigDecimal(47));
 		list.add(p2);
 
-		// Product p3 = new Product("yapu", new BigDecimal(8));
-		// list.add(p3);
-
 		Product p4 = new Product("yapu", new BigDecimal(2));
 		list.add(p4);
 
-		// TODO 为什么在这种情况下没有回滚数据呢
 		return list;
 	}
 }

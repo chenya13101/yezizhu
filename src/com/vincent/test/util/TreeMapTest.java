@@ -1,4 +1,4 @@
-package com.vincent.test;
+package com.vincent.test.util;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
