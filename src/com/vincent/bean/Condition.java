@@ -1,6 +1,7 @@
 package com.vincent.bean;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.vincent.common.MathMethod;
 import com.vincent.common.ResultCode;
@@ -36,6 +37,20 @@ public class Condition {
 
 	public void setCalculateUnit(CalculateUnit calculateUnit) {
 		this.calculateUnit = calculateUnit;
+	}
+
+	// TODO
+	public ResultMessage isAvailable(List<CalculateUnit> otherUnits) {
+		ResultMessage result = new ResultMessage();
+		if (otherUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO, BigDecimal::add)
+				.compareTo(fullElement) >= 0) {
+			result.setResultCode(ResultCode.SUCCESS);
+			return result;
+		}
+		result.setResultCode(ResultCode.FAIL);
+		result.setMethod(MathMethod.ADD);
+		//result.setCalculateUnit(otherUnits);
+		return result;
 	}
 
 	public ResultMessage isAvailable() {

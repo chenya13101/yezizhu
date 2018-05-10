@@ -72,6 +72,10 @@ public class WorkStep implements Comparable<WorkStep> {
 		this.coupon = coupon;
 	}
 
+	private ResultMessage check(List<CalculateUnit> otherUnits) {
+		return this.condition.isAvailable(otherUnits);
+	}
+
 	private ResultMessage check() {
 		return condition.isAvailable();
 	}
@@ -197,9 +201,8 @@ public class WorkStep implements Comparable<WorkStep> {
 				result.setResultCode(ResultCode.FAIL);
 				return result;
 			}
-			reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
-			result.setResultCode(ResultCode.SUCCESS);
-			return result;
+
+			return reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
 		} else if (compareValue > 0) {
 			// 是不是相同的商品可以部分参与代金券的使用
 			List<CalculateUnit> otherUnits = new ArrayList<>(calculateUnitsParam);
@@ -227,11 +230,33 @@ public class WorkStep implements Comparable<WorkStep> {
 		return result;
 	}
 
-	private void reDistributeToOtherUnits(BigDecimal amount, List<CalculateUnit> otherUnits,
+	private ResultMessage reDistributeToOtherUnits(BigDecimal amount, List<CalculateUnit> otherUnits,
 			CalculateUnit checkCalculateUnit) {
+		// 需要检查是否满足本次平摊的条件
+		ResultMessage result = this.check(otherUnits);
+		switch (result.getResultCode()) {
+		case SUCCESS:
+			printCurrentStepUnits();
+			break;
+		case FAIL:
+			printFailMessage(result);
+			// 平摊失败
+			if (previousStep == null) {
+				System.out.println("結束");
+				result.setResultCode(ResultCode.FAIL_END);
+				return result;
+			}
+
+			// TODO 如果之前不为空呢
+			break;
+		default:
+			break;
+		}
+
 		distribute(amount, otherUnits);
 		checkCalculateUnit.setCurrentValue(checkCalculateUnit.getCurrentValue(), this);
 		System.out.println("reDistributeToOtherUnits结束");
+		return result;
 	}
 
 	/**
@@ -343,7 +368,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			printFailMessage(result);
 			// 平摊失败
 			if (previousStep == null) {
-				System.out.println("結束");
+				System.out.println("失败结束");
 				return;
 			}
 
@@ -362,13 +387,8 @@ public class WorkStep implements Comparable<WorkStep> {
 				break;
 			}
 			break;
-		case END:
-			System.out.println("正常结束");
-			break;
-		case FAIL_END:
-			System.out.println("失败结束");
-			break;
 		default:
+			System.out.println("未知 check 结果");
 			break;
 		}
 
