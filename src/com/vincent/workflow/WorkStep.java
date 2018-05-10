@@ -250,8 +250,13 @@ public class WorkStep implements Comparable<WorkStep> {
 				fullElement.subtract(otherUnitCurrentSum));
 		partContainedUnits.addAll(otherUnits);
 
-		return reDistributeToOtherUnits(amount, partContainedUnits, checkCalculateUnit);
-		// TODO 再次计算平摊完是否满足 checkCalculateUnit的要求
+		ResultMessage tmpResult = reDistributeToOtherUnits(amount, partContainedUnits, checkCalculateUnit);
+		if (checkCalculateUnit.getCurrentValue().compareTo(checkCalculateUnit.getMin()) < 0) {
+			// 再次计算平摊完是否满足 checkCalculateUnit的要求
+			tmpResult.setResultCode(ResultCode.FAIL);
+		}
+		return tmpResult;
+
 	}
 
 	List<CalculateUnit> getPartContainedUnits(List<CalculateUnit> sortedUnitList, BigDecimal min) {

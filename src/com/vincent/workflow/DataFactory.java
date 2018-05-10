@@ -29,11 +29,19 @@ public class DataFactory {
 		Product p1 = new Product("apple", new BigDecimal(23));
 		list.add(p1);
 
+		for (int i = 0; i < 4; i++) {
+			Product p5 = new Product("apple", new BigDecimal(2));
+			list.add(p5);
+		}
+
 		Product p2 = new Product("coffee", new BigDecimal(47));
 		list.add(p2);
 
-		Product p3 = new Product("yapu", new BigDecimal(10));
-		list.add(p3);
+		// Product p3 = new Product("yapu", new BigDecimal(8));
+		// list.add(p3);
+
+		Product p4 = new Product("yapu", new BigDecimal(2));
+		list.add(p4);
 		return list;
 	}
 }
