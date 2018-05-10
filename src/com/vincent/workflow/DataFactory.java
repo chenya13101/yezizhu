@@ -18,7 +18,7 @@ public class DataFactory {
 		list.add(c1);
 
 		Coupon c2 = new Coupon("A002", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(30),
-				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("apple") > -1));
+				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("ap") > -1));
 		// ||input.indexOf("p") > -1
 		list.add(c2);
 		return list;
@@ -26,13 +26,13 @@ public class DataFactory {
 
 	public static List<Product> getProducts() {
 		List<Product> list = new ArrayList<>();
-		Product p1 = new Product("apple", new BigDecimal(30));
+		Product p1 = new Product("apple", new BigDecimal(23));
 		list.add(p1);
 
-		Product p2 = new Product("coffee", new BigDecimal(20));
+		Product p2 = new Product("coffee", new BigDecimal(47));
 		list.add(p2);
 
-		Product p3 = new Product("baozi", new BigDecimal(20));
+		Product p3 = new Product("yapu", new BigDecimal(10));
 		list.add(p3);
 		return list;
 	}

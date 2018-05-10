@@ -11,7 +11,7 @@ public class Condition {
 
 	private String qrCode;
 
-	private BigDecimal fullElement;
+	private BigDecimal fullElement = BigDecimal.ZERO;
 
 	private CalculateUnit calculateUnit;
 
@@ -49,7 +49,7 @@ public class Condition {
 		}
 		result.setResultCode(ResultCode.FAIL);
 		result.setMethod(MathMethod.ADD);
-		//result.setCalculateUnit(otherUnits);
+		// result.setCalculateUnit(otherUnits);
 		return result;
 	}
 

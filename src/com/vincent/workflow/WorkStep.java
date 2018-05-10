@@ -201,7 +201,6 @@ public class WorkStep implements Comparable<WorkStep> {
 				result.setResultCode(ResultCode.FAIL);
 				return result;
 			}
-
 			return reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
 		} else if (compareValue > 0) {
 			// 是不是相同的商品可以部分参与代金券的使用
@@ -209,17 +208,19 @@ public class WorkStep implements Comparable<WorkStep> {
 			otherUnits.removeAll(containedUnitList);// 减去非本步骤包含的当前值
 			BigDecimal othersCurrentTotal = otherUnits.stream().map(unit -> unit.getCurrentValue())
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
-			int compareValue2 = othersCurrentTotal.compareTo(checkCalculateUnit.getMin());
+
+			int compareValue2 = othersCurrentTotal.compareTo(checkCalculateUnit.getMin());// 其它商品平摊前总价最低要求要大于min
 			if (compareValue2 < 0) {
 				// TODO 那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败
 			} else {
 				// if (compareValue2 >= 0)
 				// TODO 先不管其它步骤的处理，以及如何循环更改，直接让其它的计算单元平摊
-				reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
-				printUnits(otherUnits);
-
-				result.setResultCode(ResultCode.SUCCESS);
-				return result;
+				ResultMessage reDistributeResult = reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
+				if (reDistributeResult.getResultCode() == ResultCode.FAIL) {
+					return reDistributeToOtherUnitsWithPartContainedUnits(amount, otherUnits, checkCalculateUnit,
+							containedUnitList);
+				}
+				return reDistributeResult;
 			}
 		} else {
 			result.setResultCode(ResultCode.FAIL);
@@ -227,6 +228,44 @@ public class WorkStep implements Comparable<WorkStep> {
 		}
 
 		result.setResultCode(ResultCode.FAIL);
+		return result;
+	}
+
+	private ResultMessage reDistributeToOtherUnitsWithPartContainedUnits(BigDecimal amount,
+			List<CalculateUnit> otherUnits, CalculateUnit checkCalculateUnit, List<CalculateUnit> containedUnitList) {
+		// 这里不需要再次check
+		// TODO 给containedUnitList排序一下，从低到高开始参与本次的平摊
+		List<CalculateUnit> sortedUnitList = containedUnitList.stream()
+				.sorted((unit1, unit2) -> unit1.getCurrentValue().compareTo(unit2.getCurrentValue()))
+				.collect(Collectors.toList());
+
+		BigDecimal otherUnitCurrentSum = otherUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		BigDecimal fullElement = this.getCondition().getFullElement();
+		if (otherUnitCurrentSum.compareTo(fullElement) >= 0) {
+			throw new RuntimeException("这种情况不应该出现，上一步就可以处理的");
+		}
+
+		List<CalculateUnit> partContainedUnits = getPartContainedUnits(sortedUnitList,
+				fullElement.subtract(otherUnitCurrentSum));
+		partContainedUnits.addAll(otherUnits);
+
+		return reDistributeToOtherUnits(amount, partContainedUnits, checkCalculateUnit);
+		// TODO 再次计算平摊完是否满足 checkCalculateUnit的要求
+	}
+
+	List<CalculateUnit> getPartContainedUnits(List<CalculateUnit> sortedUnitList, BigDecimal min) {
+		List<CalculateUnit> result = new ArrayList<>();
+		for (CalculateUnit tmpUnit : sortedUnitList) {
+			if (tmpUnit.getCurrentValue().compareTo(min) >= 0) {
+				result.add(tmpUnit);
+				return result;
+			}
+		}
+
+		if (result.size() == sortedUnitList.size()) {
+			result.clear(); // 可以一直加，但是如果碰到需要全部加入才能满足的情况就直接放弃
+		}
 		return result;
 	}
 
@@ -241,14 +280,8 @@ public class WorkStep implements Comparable<WorkStep> {
 		case FAIL:
 			printFailMessage(result);
 			// 平摊失败
-			if (previousStep == null) {
-				System.out.println("結束");
-				result.setResultCode(ResultCode.FAIL_END);
-				return result;
-			}
-
-			// TODO 如果之前不为空呢
-			break;
+			result.setResultCode(ResultCode.FAIL);
+			return result;
 		default:
 			break;
 		}
@@ -256,6 +289,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		distribute(amount, otherUnits);
 		checkCalculateUnit.setCurrentValue(checkCalculateUnit.getCurrentValue(), this);
 		System.out.println("reDistributeToOtherUnits结束");
+		printUnits(otherUnits);
 		return result;
 	}
 
