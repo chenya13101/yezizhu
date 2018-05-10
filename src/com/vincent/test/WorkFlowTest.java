@@ -54,7 +54,7 @@ class WorkFlowTest {
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
-		assertEquals(new BigDecimal(80), resultSum);
+		assertNotEquals(new BigDecimal(80), resultSum);
 	}
 
 	/**

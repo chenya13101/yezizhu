@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.vincent.bean.CalculateUnit;
@@ -26,13 +27,14 @@ public class WorkStep implements Comparable<WorkStep> {
 
 	private List<CalculateUnit> calculateUnits;
 
-	private List<CalculateUnit> checkCalculateUnitList;
-
 	private Coupon coupon;
 
 	private WorkStep nextStep;
 
 	private WorkStep previousStep;
+
+	AtomicInteger useCount = new AtomicInteger(0);// 为了避免死循环，同时又不循环求中值而采取的折中方法
+	final int maxUseCount = 2;
 
 	public WorkStep getNextStep() {
 		return nextStep;
@@ -80,14 +82,6 @@ public class WorkStep implements Comparable<WorkStep> {
 
 	private ResultMessage check() {
 		return condition.isAvailable();
-	}
-
-	public List<CalculateUnit> getCheckCalculateUnitList() {
-		return checkCalculateUnitList;
-	}
-
-	public void setCheckCalculateUnitList(List<CalculateUnit> checkCalculateUnitList) {
-		this.checkCalculateUnitList = checkCalculateUnitList;
 	}
 
 	public static BigDecimal getTen() {
@@ -142,6 +136,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			}
 			unit.saveStepChangeValue(this, unit.getCurrentValue());
 		}
+		printCurrentStepUnits();
 	}
 
 	private List<CalculateUnit> getAllCalculateUnitsFromOne(CalculateUnit calculateUnit) {
@@ -156,6 +151,12 @@ public class WorkStep implements Comparable<WorkStep> {
 	}
 
 	private ResultMessage dealFailMessageFromNextStep(ResultMessage result) {
+		if (useCount.incrementAndGet() > maxUseCount) {
+			return new ResultMessage(ResultCode.FAIL_END);
+		}
+
+		recoverCalculateUnits();
+
 		if (this.calculateUnits.size() == 0 && this.previousStep == null) {
 			System.out.println("无法进一步处理,结束");
 			return new ResultMessage(ResultCode.FAIL_END);
@@ -188,18 +189,19 @@ public class WorkStep implements Comparable<WorkStep> {
 			}
 		}
 
+		// 如果当前步骤没有平摊成功，那么寻求更早之前的step改变平摊范围
 		ResultMessage previousMessage;
 		if (dealResult == null && previousStep != null) {
 			previousMessage = previousStep.dealFailMessageFromNextStep(result);
 			if (previousMessage.getResultCode() == ResultCode.SUCCESS) {
-				this.run();
+				this.work();
 			}
 			return previousMessage;
 		}
 		if (dealResult.getResultCode() == ResultCode.FAIL && previousStep != null) {
 			previousMessage = previousStep.dealFailMessageFromNextStep(dealResult);
 			if (previousMessage.getResultCode() == ResultCode.SUCCESS) {
-				this.run();
+				this.work();
 			}
 			return previousMessage;
 		}
@@ -218,7 +220,7 @@ public class WorkStep implements Comparable<WorkStep> {
 	private ResultMessage reDistribute(BigDecimal amount, List<CalculateUnit> calculateUnitsParam,
 			List<CalculateUnit> containedUnitList, CalculateUnit checkCalculateUnit) {
 		ResultMessage result = new ResultMessage();
-		recoverCalculateUnits(calculateUnitsParam);
+		// recoverCalculateUnits(calculateUnitsParam);
 		BigDecimal sameUnitCurrentValueSum = containedUnitList.stream().map(unit -> unit.getCurrentValue())
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -292,7 +294,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		// TODO 之后可以考虑返回多个对象，而不是单个
 		if (checkCalculateUnit.getCurrentValue().compareTo(checkCalculateUnit.getMin()) < 0) {
 			// 再次计算平摊完是否满足 checkCalculateUnit的要求
-			recoverCalculateUnits(partContainedUnits);
+			// recoverCalculateUnits(partContainedUnits);
 			tmpResult.setResultCode(ResultCode.FAIL);
 			tmpResult.setCalculateUnit(checkCalculateUnit);
 		}
@@ -344,8 +346,9 @@ public class WorkStep implements Comparable<WorkStep> {
 	 * @param containedUnitList
 	 * @return
 	 */
-	private void recoverCalculateUnits(List<CalculateUnit> containedUnitList) {
-		containedUnitList.forEach(unit -> unit.recover(this.previousStep));
+	private void recoverCalculateUnits() {
+		// containedUnitList.forEach(unit -> unit.recover(this.previousStep));
+		this.calculateUnits.forEach(unit -> unit.recover(this.previousStep));
 	}
 
 	/**
@@ -367,7 +370,6 @@ public class WorkStep implements Comparable<WorkStep> {
 			return result;
 		}
 
-		recoverCalculateUnits(containedUnitList);
 		List<CalculateUnit> sortedUnitList = containedUnitList.stream()
 				.sorted((unit1, unit2) -> unit1.getCurrentValue().compareTo(unit2.getCurrentValue()))
 				.collect(Collectors.toList());
@@ -433,16 +435,12 @@ public class WorkStep implements Comparable<WorkStep> {
 		return null;
 	}
 
-	private void runAgain() {
-		run();
-	}
-
 	public void run() {
 		ResultMessage result = this.check();
 		switch (result.getResultCode()) {
 		case SUCCESS:
 			this.work();
-			printCurrentStepUnits();
+			//printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();
 			}
@@ -477,7 +475,7 @@ public class WorkStep implements Comparable<WorkStep> {
 	}
 
 	private void printFailMessage(ResultMessage result) {
-		System.out.println("平摊失败: 需要" + result.getMethod() + "");
+		System.out.println(this.getName() + "平摊失败: 需要" + result.getMethod() + "");
 		System.out.println(result.getCalculateUnit());
 	}
 
