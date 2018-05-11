@@ -17,7 +17,7 @@ import com.vincent.common.ResultMessage;
 
 public class WorkStep implements Comparable<WorkStep> {
 
-	private boolean test = false;
+	private boolean test = true;
 
 	private String name;
 

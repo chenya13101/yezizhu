@@ -41,18 +41,19 @@ public class FullWorkFlowDemo {
 		Coupon c5 = new Coupon("全场券", CouponTypeEnum.DISCOUNT, new BigDecimal(5), null, new BigDecimal(50),
 				(unit) -> true);
 		couponList.add(c5);
-
 		return couponList;
 	}
 
 	public List<Product> getProductList() {
 		List<Product> productList = new ArrayList<>();
+		Product p2 = new Product("coffee", new BigDecimal(50));
+		productList.add(p2);
+
 		Product p1 = new Product("apple", new BigDecimal(23));
 		productList.add(p1);
-		Product p2 = new Product("coffee", new BigDecimal(47));
-		productList.add(p2);
 		Product p4 = new Product("yapu", new BigDecimal(10));
 		productList.add(p4);
+
 		return productList;
 	}
 
@@ -110,7 +111,8 @@ public class FullWorkFlowDemo {
 
 		List<int[]> list = new ArrayList<>();
 		int couponSize = couponList.size();
-		for (int i = 1; i <= FullWorkFlowDemo.MAX_COUPON_NUM; i++) {
+		int size = Integer.min(FullWorkFlowDemo.MAX_COUPON_NUM, couponSize);
+		for (int i = 1; i <= size; i++) {
 			list.addAll(sequenceGenerator.getSequences(couponSize, i));
 		}
 

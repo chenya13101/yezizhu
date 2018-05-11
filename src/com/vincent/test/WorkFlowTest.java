@@ -33,14 +33,15 @@ class WorkFlowTest {
 
 		// 模拟创建产品
 		List<Product> productList = new ArrayList<>();
-		Product p1 = new Product("apple", new BigDecimal(23));
+		Product p2 = new Product("coffee", new BigDecimal(47));
+		productList.add(p2);
+		
+		Product p1 = new Product("apple", new BigDecimal(19));
 		productList.add(p1);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 6; i++) {
 			Product p5 = new Product("apple", new BigDecimal(2));
 			productList.add(p5);
 		}
-		Product p2 = new Product("coffee", new BigDecimal(47));
-		productList.add(p2);
 		Product p4 = new Product("yapu", new BigDecimal(2));
 		productList.add(p4);
 
@@ -54,7 +55,7 @@ class WorkFlowTest {
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
-		assertEquals(new BigDecimal(70).doubleValue(), resultSum.doubleValue());
+		assertEquals(new BigDecimal(60).doubleValue(), resultSum.doubleValue());
 	}
 
 	/**
@@ -64,20 +65,22 @@ class WorkFlowTest {
 	void test2() {
 		// 模拟创建优惠券
 		List<Coupon> couponList = new ArrayList<>();
-		Coupon c1 = new Coupon("A001", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
+		Coupon c1 = new Coupon("a或c券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
 				(unit) -> unit.getProductCode() != null
 						&& (unit.getProductCode().indexOf("a") > -1 || unit.getProductCode().indexOf("c") > -1));
 		couponList.add(c1);
-		Coupon c2 = new Coupon("A002", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(30),
+		Coupon c2 = new Coupon("ap券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(30),
 				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("ap") > -1));
 		couponList.add(c2);
 
 		// 模拟创建产品
 		List<Product> productList = new ArrayList<>();
-		Product p1 = new Product("apple", new BigDecimal(23));
-		productList.add(p1);
+		
 		Product p2 = new Product("coffee", new BigDecimal(47));
 		productList.add(p2);
+		
+		Product p1 = new Product("apple", new BigDecimal(23));
+		productList.add(p1);
 		Product p4 = new Product("yapu", new BigDecimal(10));
 		productList.add(p4);
 
