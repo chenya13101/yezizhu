@@ -102,7 +102,6 @@ public class WorkStep implements Comparable<WorkStep> {
 			distribute(coupon.getAmount(), calculateUnits);
 			break;
 		default:
-			coupon.getDiscount();
 			break;
 		}
 	}
@@ -182,8 +181,10 @@ public class WorkStep implements Comparable<WorkStep> {
 			switch (typeEnum) {
 			case DISCOUNT:
 				dealResult = reDiscount(coupon.getDiscount(), sameUnitSet, result.getCalculateUnit());
+				break;
 			case CASH:
 				dealResult = reDistribute(coupon.getAmount(), calculateUnits, sameUnitSet, result.getCalculateUnit());
+				break;
 			default:
 				break;
 			}
@@ -250,9 +251,9 @@ public class WorkStep implements Comparable<WorkStep> {
 			int compareValue2 = othersCurrentTotal.compareTo(checkCalculateUnit.getMin());// 其它商品平摊前总价最低要求要大于min
 			if (compareValue2 < 0) {
 				// TODO 那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败
+				System.out.println("那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败");
 			} else {
-				// if (compareValue2 >= 0)
-				// TODO 先不管其它步骤的处理，以及如何循环更改，直接让其它的计算单元平摊
+				// 先不管其它步骤的处理，以及如何循环更改，直接让其它的计算单元平摊
 				ResultMessage reDistributeResult = reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);
 				if (reDistributeResult.getResultCode() == ResultCode.FAIL) {
 					return reDistributeToOtherUnitsWithPartContainedUnits(amount, otherUnits, checkCalculateUnit,
@@ -336,7 +337,7 @@ public class WorkStep implements Comparable<WorkStep> {
 
 		distribute(amount, otherUnits);
 		checkCalculateUnit.setCurrentValue(checkCalculateUnit.getCurrentValue(), this);
-		printUnits(otherUnits);
+		// printUnits(otherUnits);
 		return result;
 	}
 
@@ -440,7 +441,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		switch (result.getResultCode()) {
 		case SUCCESS:
 			this.work();
-			//printCurrentStepUnits();
+			// printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();
 			}
@@ -456,7 +457,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			ResultMessage previousResult = previousStep.dealFailMessageFromNextStep(result); // 通知之前的步骤调整
 			switch (previousResult.getResultCode()) {
 			case SUCCESS:
-				// TODO 所有步骤，都应该检验一下是否有计算单元的值是由之后步骤产生的，避免引起混淆
+				// 所有步骤，都应该检验一下是否有计算单元的值是由之后步骤产生的，避免引起混淆
 				run();// 再次执行本步骤，因为之前的步骤已经把平摊值改了
 				break;
 			case FAIL:
@@ -477,11 +478,6 @@ public class WorkStep implements Comparable<WorkStep> {
 	private void printFailMessage(ResultMessage result) {
 		System.out.println(this.getName() + "平摊失败: 需要" + result.getMethod() + "");
 		System.out.println(result.getCalculateUnit());
-	}
-
-	private void printUnits(List<CalculateUnit> otherUnits) {
-		System.out.println(this.getName() + " success:");
-		otherUnits.forEach(unit -> System.out.println(unit));
 	}
 
 	private void printCurrentStepUnits() {

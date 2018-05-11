@@ -84,7 +84,6 @@ public class CalculateUnit {
 		this.previousStepVauleMap = previousStepVauleMap;
 	}
 
-	// TODO 期待这个方法能够发挥作用
 	public void saveStepChangeValue(WorkStep step, BigDecimal value) {
 		previousStepVauleMap.put(step, value);
 		if (previousStepVauleMap.size() > 1 && previousStepVauleMap.lastKey() != step) {
