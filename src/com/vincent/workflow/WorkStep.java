@@ -104,6 +104,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		default:
 			break;
 		}
+		printCurrentStepUnits();
 	}
 
 	private void discount(BigDecimal discount, List<CalculateUnit> calculateUnits2) {
@@ -135,7 +136,6 @@ public class WorkStep implements Comparable<WorkStep> {
 			}
 			unit.saveStepChangeValue(this, unit.getCurrentValue());
 		}
-		printCurrentStepUnits();
 	}
 
 	private List<CalculateUnit> getAllCalculateUnitsFromOne(CalculateUnit calculateUnit) {
@@ -206,6 +206,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			}
 			return previousMessage;
 		}
+		printCurrentStepUnits();
 		return dealResult;
 	}
 
@@ -441,7 +442,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		switch (result.getResultCode()) {
 		case SUCCESS:
 			this.work();
-			// printCurrentStepUnits();
+			//printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();
 			}

@@ -10,23 +10,29 @@ import com.vincent.bean.Product;
 
 public class WorkFlow {
 
+	private List<CalculateUnit> calculateUnits;
+
 	public static void main(String[] args) {
 		List<Coupon> couponList = DataFactory.getCoupons();
 		if (couponList == null)
 			return;
 
 		List<Product> productList = DataFactory.getProducts();
-
 		WorkFlow workFlow = new WorkFlow();
-		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.createCalculateUnits(productList);
+
+		List<WorkStep> steps = workFlow.createWorkSteps(couponList, workFlow.getCalculateUnits());
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 	}
 
-	public void showResult(List<CalculateUnit> calculateUnits) {
+	public List<CalculateUnit> returnResult() {
+		return calculateUnits;
+	}
+
+	public void showResult() {
 		System.out.println("最终结果:");
-		calculateUnits.forEach(System.out::println);
+		this.calculateUnits.forEach(System.out::println);
 	}
 
 	public void start(List<WorkStep> steps) {
@@ -82,6 +88,14 @@ public class WorkFlow {
 			unit.setProductCode(product.getCode());
 			return unit;
 		}).collect(Collectors.toList());
+	}
+
+	public List<CalculateUnit> getCalculateUnits() {
+		return calculateUnits;
+	}
+
+	public void setCalculateUnits(List<CalculateUnit> calculateUnits) {
+		this.calculateUnits = calculateUnits;
 	}
 
 }

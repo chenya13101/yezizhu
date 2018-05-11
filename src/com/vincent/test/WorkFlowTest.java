@@ -50,7 +50,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -87,7 +87,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -128,7 +128,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -161,7 +161,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -192,7 +192,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -223,7 +223,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -255,7 +255,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
@@ -290,7 +290,7 @@ class WorkFlowTest {
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
 		workFlow.start(steps);
-		workFlow.showResult(calculateUnits);
+		workFlow.showResult();
 
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
