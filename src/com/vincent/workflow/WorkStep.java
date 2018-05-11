@@ -255,7 +255,8 @@ public class WorkStep implements Comparable<WorkStep> {
 			int compareValue2 = othersCurrentTotal.compareTo(checkCalculateUnit.getMin());// 其它商品平摊前总价最低要求要大于min
 			if (compareValue2 < 0) {
 				// TODO 那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败
-				System.out.println("那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败");
+				if (test)
+					System.out.println("那么必须部分参与这次的平摊,如果不能参与那么可以直接判定失败");
 			} else {
 				// 先不管其它步骤的处理，以及如何循环更改，直接让其它的计算单元平摊
 				ResultMessage reDistributeResult = reDistributeToOtherUnits(amount, otherUnits, checkCalculateUnit);

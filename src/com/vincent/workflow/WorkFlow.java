@@ -1,5 +1,6 @@
 package com.vincent.workflow;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,9 @@ public class WorkFlow {
 	}
 
 	public void showResult() {
-		System.out.println("最终结果:");
+		BigDecimal totalCurrentValue = this.calculateUnits.stream().map(CalculateUnit::getCurrentValue)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		System.out.println("最终结果:" + totalCurrentValue.toString());
 		this.calculateUnits.forEach(System.out::println);
 	}
 

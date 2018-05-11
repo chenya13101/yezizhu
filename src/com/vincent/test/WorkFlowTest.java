@@ -297,4 +297,43 @@ class WorkFlowTest {
 		assertEquals(25, resultSum.doubleValue());
 	}
 
+	@Test
+	void test9() {
+		// 模拟创建优惠券
+		List<Coupon> couponList = new ArrayList<>();
+		Coupon c4 = new Coupon("p券", CouponTypeEnum.CASH, null, new BigDecimal(12), new BigDecimal(31),
+				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("p") > -1));
+		couponList.add(c4);
+
+		Coupon c3 = new Coupon("全场券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
+				(unit) -> true);
+		couponList.add(c3);
+
+		Coupon c1 = new Coupon("a和c券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
+				(unit) -> unit.getProductCode() != null
+						&& (unit.getProductCode().indexOf("a") > -1 || unit.getProductCode().indexOf("c") > -1));
+		couponList.add(c1);
+
+		// 模拟创建产品
+		List<Product> productList = new ArrayList<>();
+		Product p1 = new Product("apple", new BigDecimal(23));
+		productList.add(p1);
+		Product p2 = new Product("coffee", new BigDecimal(47));
+		productList.add(p2);
+		Product p4 = new Product("yapu", new BigDecimal(10));
+		productList.add(p4);
+
+		// 实际的工作流
+		WorkFlow workFlow = new WorkFlow();
+		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
+		workFlow.showResult();
+
+		// 验证结果
+		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		assertEquals(48, resultSum.doubleValue());
+	}
+
 }
