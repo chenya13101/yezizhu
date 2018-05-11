@@ -17,6 +17,8 @@ import com.vincent.common.ResultMessage;
 
 public class WorkStep implements Comparable<WorkStep> {
 
+	private boolean test = false;
+
 	private String name;
 
 	private final static BigDecimal TEN = new BigDecimal(10);
@@ -161,7 +163,8 @@ public class WorkStep implements Comparable<WorkStep> {
 			return new ResultMessage(ResultCode.FAIL_END);
 		}
 
-		System.out.println(this.getName() + ":处理next传递来的修改请求");
+		if (test)
+			System.out.println(this.getName() + ":处理next传递来的修改请求");
 
 		ResultMessage dealResult = null;
 		List<CalculateUnit> nextUnits = getAllCalculateUnitsFromOne(result.getCalculateUnit());
@@ -442,7 +445,7 @@ public class WorkStep implements Comparable<WorkStep> {
 		switch (result.getResultCode()) {
 		case SUCCESS:
 			this.work();
-			//printCurrentStepUnits();
+			// printCurrentStepUnits();
 			if (nextStep != null) {
 				nextStep.run();
 			}
@@ -463,7 +466,8 @@ public class WorkStep implements Comparable<WorkStep> {
 				break;
 			case FAIL:
 			case FAIL_END:
-				System.out.println(this.getName() + ":上一步骤[" + previousStep.getName() + "]处理失败,结束流程");
+				if (test)
+					System.out.println(this.getName() + ":上一步骤[" + previousStep.getName() + "]处理失败,结束流程");
 				break;
 			default:
 				break;
@@ -477,11 +481,16 @@ public class WorkStep implements Comparable<WorkStep> {
 	}
 
 	private void printFailMessage(ResultMessage result) {
+		if (!test)
+			return;
+
 		System.out.println(this.getName() + "平摊失败: ");
 		System.out.println(result.getCalculateUnit());
 	}
 
 	private void printCurrentStepUnits() {
+		if (!test)
+			return;
 		System.out.println(this.getName() + " success:");
 		calculateUnits.forEach(unit -> System.out.println(unit));
 	}

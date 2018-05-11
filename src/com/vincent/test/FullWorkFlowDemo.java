@@ -2,7 +2,11 @@ package com.vincent.test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.vincent.bean.CalculateUnit;
 import com.vincent.bean.Coupon;
@@ -14,8 +18,7 @@ import com.vincent.workflow.WorkFlow;
 import com.vincent.workflow.WorkStep;
 
 public class FullWorkFlowDemo {
-
-	private SequenceGenerator sequenceGenerator = new CouponSequenceGenerator();
+	private final static int MAX_COUPON_NUM = 3;
 
 	private List<Coupon> getCouponList() {
 		List<Coupon> couponList = new ArrayList<>();
@@ -44,34 +47,65 @@ public class FullWorkFlowDemo {
 		return productList;
 	}
 
-	public void test() {
-		FullWorkFlowDemo demo = new FullWorkFlowDemo();
-		// 模拟创建优惠券
-		List<Coupon> couponList = demo.getCouponList();
-		// 模拟创建产品
-		List<Product> productList = getProductList();
-
-		List<int[]> list = sequenceGenerator.getSequences(3, 3);
-
-		BigDecimal min = null;
-		int[] minArray = null;
-		for (int[] tmpArray : list) {
-			min = getCalculateResult(tmpArray, couponList, productList);
-			minArray = tmpArray;
-			// TODO 异步 completableTask来处理
-		}
-		System.out.println(min);
-		System.out.println(minArray);
-
-	}
-
-	private BigDecimal getCalculateResult(int[] tmpArray, List<Coupon> couponList, List<Product> productList) {
+	private Result getCalculateResult(int[] tmpArray, List<Coupon> couponList, List<Product> productList) {
 		WorkFlow workFlow = new WorkFlow();
 		workFlow.createCalculateUnits(productList);
 		List<WorkStep> steps = workFlow.createWorkSteps(couponList, workFlow.getCalculateUnits());
 		workFlow.start(steps);
-		List<CalculateUnit> result = workFlow.returnResult();
-		return result.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal totalCurrentValue = workFlow.getCalculateUnits().stream().map(CalculateUnit::getCurrentValue)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		return new Result(tmpArray, totalCurrentValue, workFlow.getCalculateUnits());
 	}
 
+	private class Result {
+		private int[] couponArray;
+
+		private BigDecimal total;
+
+		private List<CalculateUnit> calculateUnits;
+
+		public Result(int[] couponArray, BigDecimal total, List<CalculateUnit> calculateUnits) {
+			// super();
+			this.couponArray = couponArray;
+			this.total = total;
+			this.calculateUnits = calculateUnits;
+		}
+
+		public BigDecimal getTotal() {
+			return total;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append(Arrays.toString(couponArray)).append("; \n");
+			builder.append(total.toString()).append("; \n");
+			this.calculateUnits.forEach(unit -> builder.append(unit.toString()).append("; \n"));
+			return builder.toString();
+		}
+	}
+
+	public static void main(String[] args) {
+		SequenceGenerator sequenceGenerator = new CouponSequenceGenerator();
+		FullWorkFlowDemo demo = new FullWorkFlowDemo();
+		// 模拟创建优惠券
+		List<Coupon> couponList = demo.getCouponList();
+		// 模拟创建产品
+		List<Product> productList = demo.getProductList();
+
+		List<int[]> list = new ArrayList<>();
+		int couponSize = couponList.size();
+		for (int i = 1; i <= FullWorkFlowDemo.MAX_COUPON_NUM; i++) {
+			list.addAll(sequenceGenerator.getSequences(couponSize, i));
+		}
+
+		List<CompletableFuture<Result>> calculateFutures = list.stream()
+				.map(tmpArray -> CompletableFuture
+						.supplyAsync(() -> demo.getCalculateResult(tmpArray, couponList, productList)))
+				.collect(Collectors.toList());
+		Optional<Result> leastResult = calculateFutures.stream().map(CompletableFuture::join)
+				.reduce((c1, c2) -> c1.getTotal().compareTo(c2.getTotal()) < 0 ? c1 : c2);
+
+		leastResult.ifPresent(System.out::println);
+	}
 }

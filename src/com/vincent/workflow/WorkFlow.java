@@ -26,10 +26,6 @@ public class WorkFlow {
 		workFlow.showResult();
 	}
 
-	public List<CalculateUnit> returnResult() {
-		return calculateUnits;
-	}
-
 	public void showResult() {
 		System.out.println("最终结果:");
 		this.calculateUnits.forEach(System.out::println);
@@ -43,6 +39,9 @@ public class WorkFlow {
 		List<WorkStep> steps = couponList.stream().map(coupon -> {
 			WorkStep step = new WorkStep();
 
+			if (calculateUnits == null || coupon == null || coupon.getFilterRule() == null) {
+				System.out.println();
+			}
 			// 要根据规则过滤
 			step.setCalculateUnits(calculateUnits.stream().filter(coupon.getFilterRule()).collect(Collectors.toList()));
 
@@ -82,12 +81,15 @@ public class WorkFlow {
 	}
 
 	public List<CalculateUnit> createCalculateUnits(List<Product> productList) {
-		return productList.stream().map(product -> {
+		List<CalculateUnit> list = productList.stream().map(product -> {
 			CalculateUnit unit = new CalculateUnit();
 			unit.setMax(product.getPrice());
 			unit.setProductCode(product.getCode());
 			return unit;
 		}).collect(Collectors.toList());
+		this.setCalculateUnits(list);
+
+		return list;
 	}
 
 	public List<CalculateUnit> getCalculateUnits() {
