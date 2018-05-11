@@ -13,7 +13,6 @@ import com.vincent.bean.Coupon;
 import com.vincent.bean.Product;
 import com.vincent.common.CouponTypeEnum;
 import com.vincent.workflow.WorkFlow;
-import com.vincent.workflow.WorkStep;
 
 class WorkFlowTest {
 
@@ -48,8 +47,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -85,8 +84,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -126,8 +125,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -159,8 +158,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -190,8 +189,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -221,8 +220,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -253,8 +252,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果
@@ -288,8 +287,8 @@ class WorkFlowTest {
 		// 实际的工作流
 		WorkFlow workFlow = new WorkFlow();
 		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, calculateUnits);
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
 		workFlow.showResult();
 
 		// 验证结果

@@ -12,6 +12,8 @@ public class WorkFlow {
 
 	private List<CalculateUnit> calculateUnits;
 
+	List<WorkStep> workSteps;
+
 	public static void main(String[] args) {
 		List<Coupon> couponList = DataFactory.getCoupons();
 		if (couponList == null)
@@ -21,8 +23,8 @@ public class WorkFlow {
 		WorkFlow workFlow = new WorkFlow();
 		workFlow.createCalculateUnits(productList);
 
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, workFlow.getCalculateUnits());
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, workFlow.getCalculateUnits());
+		workFlow.start();
 		workFlow.showResult();
 	}
 
@@ -31,11 +33,11 @@ public class WorkFlow {
 		this.calculateUnits.forEach(System.out::println);
 	}
 
-	public void start(List<WorkStep> steps) {
-		steps.get(0).run();
+	public void start() {
+		this.getWorkSteps().get(0).run();
 	}
 
-	public List<WorkStep> createWorkSteps(List<Coupon> couponList, List<CalculateUnit> calculateUnits) {
+	public void createWorkSteps(List<Coupon> couponList, List<CalculateUnit> calculateUnits) {
 		List<WorkStep> steps = couponList.stream().map(coupon -> {
 			WorkStep step = new WorkStep();
 
@@ -77,7 +79,7 @@ public class WorkFlow {
 			previous.setNextStep(step);
 			previous = step;
 		}
-		return steps;
+		this.setWorkSteps(steps);
 	}
 
 	public List<CalculateUnit> createCalculateUnits(List<Product> productList) {
@@ -98,6 +100,14 @@ public class WorkFlow {
 
 	public void setCalculateUnits(List<CalculateUnit> calculateUnits) {
 		this.calculateUnits = calculateUnits;
+	}
+
+	public List<WorkStep> getWorkSteps() {
+		return workSteps;
+	}
+
+	public void setWorkSteps(List<WorkStep> workSteps) {
+		this.workSteps = workSteps;
 	}
 
 }

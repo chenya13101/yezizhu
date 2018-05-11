@@ -15,7 +15,6 @@ import com.vincent.common.CouponTypeEnum;
 import com.vincent.util.CouponSequenceGenerator;
 import com.vincent.util.SequenceGenerator;
 import com.vincent.workflow.WorkFlow;
-import com.vincent.workflow.WorkStep;
 
 public class FullWorkFlowDemo {
 	private final static int MAX_COUPON_NUM = 3;
@@ -50,8 +49,8 @@ public class FullWorkFlowDemo {
 	private Result getCalculateResult(int[] tmpArray, List<Coupon> couponList, List<Product> productList) {
 		WorkFlow workFlow = new WorkFlow();
 		workFlow.createCalculateUnits(productList);
-		List<WorkStep> steps = workFlow.createWorkSteps(couponList, workFlow.getCalculateUnits());
-		workFlow.start(steps);
+		workFlow.createWorkSteps(couponList, workFlow.getCalculateUnits());
+		workFlow.start();
 		BigDecimal totalCurrentValue = workFlow.getCalculateUnits().stream().map(CalculateUnit::getCurrentValue)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 		return new Result(tmpArray, totalCurrentValue, workFlow.getCalculateUnits());
