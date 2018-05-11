@@ -1,4 +1,4 @@
-package com.vincent.bean;
+package com.vincent.common;
 
 /**
  * 优惠券类型 1.折扣券 2.现金券

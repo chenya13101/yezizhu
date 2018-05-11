@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import com.vincent.bean.CalculateUnit;
 import com.vincent.bean.Coupon;
-import com.vincent.bean.CouponTypeEnum;
 import com.vincent.bean.Product;
+import com.vincent.common.CouponTypeEnum;
 import com.vincent.workflow.WorkFlow;
 import com.vincent.workflow.WorkStep;
 
@@ -166,7 +166,7 @@ class WorkFlowTest {
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
-		assertEquals(50, resultSum.doubleValue());
+		assertEquals(40, resultSum.doubleValue());
 	}
 
 	/**
@@ -295,7 +295,7 @@ class WorkFlowTest {
 		// 验证结果
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
-		assertEquals(29, resultSum.doubleValue());
+		assertEquals(25, resultSum.doubleValue());
 	}
 
 }

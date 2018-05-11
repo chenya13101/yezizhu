@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vincent.bean.Coupon;
-import com.vincent.bean.CouponTypeEnum;
 import com.vincent.bean.Product;
+import com.vincent.common.CouponTypeEnum;
 
 public class DataFactory {
 

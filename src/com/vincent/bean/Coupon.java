@@ -3,6 +3,8 @@ package com.vincent.bean;
 import java.math.BigDecimal;
 import java.util.function.Predicate;
 
+import com.vincent.common.CouponTypeEnum;
+
 public class Coupon {
 
 	private String code;

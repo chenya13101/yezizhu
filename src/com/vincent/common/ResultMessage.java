@@ -6,7 +6,7 @@ public class ResultMessage {
 
 	private ResultCode resultCode;
 
-	private MathMethod method;
+	//private MathMethod method;
 
 	private CalculateUnit calculateUnit;
 
@@ -24,14 +24,6 @@ public class ResultMessage {
 
 	public void setResultCode(ResultCode resultCode) {
 		this.resultCode = resultCode;
-	}
-
-	public MathMethod getMethod() {
-		return method;
-	}
-
-	public void setMethod(MathMethod method) {
-		this.method = method;
 	}
 
 	public CalculateUnit getCalculateUnit() {

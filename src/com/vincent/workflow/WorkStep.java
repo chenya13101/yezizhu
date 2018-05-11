@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import com.vincent.bean.CalculateUnit;
 import com.vincent.bean.Condition;
 import com.vincent.bean.Coupon;
-import com.vincent.bean.CouponTypeEnum;
+import com.vincent.common.CouponTypeEnum;
 import com.vincent.common.ResultCode;
 import com.vincent.common.ResultMessage;
 
@@ -476,7 +476,7 @@ public class WorkStep implements Comparable<WorkStep> {
 	}
 
 	private void printFailMessage(ResultMessage result) {
-		System.out.println(this.getName() + "平摊失败: 需要" + result.getMethod() + "");
+		System.out.println(this.getName() + "平摊失败: ");
 		System.out.println(result.getCalculateUnit());
 	}
 

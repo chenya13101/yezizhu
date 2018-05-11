@@ -3,7 +3,6 @@ package com.vincent.bean;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.vincent.common.MathMethod;
 import com.vincent.common.ResultCode;
 import com.vincent.common.ResultMessage;
 
@@ -50,7 +49,7 @@ public class Condition {
 			return result;
 		}
 		result.setResultCode(ResultCode.FAIL);
-		result.setMethod(MathMethod.ADD);
+		// result.setMethod(MathMethod.ADD);
 		// result.setCalculateUnit(otherUnits);
 		return result;
 	}
@@ -62,7 +61,7 @@ public class Condition {
 			return result;
 		}
 		result.setResultCode(ResultCode.FAIL);
-		result.setMethod(MathMethod.ADD);
+		// result.setMethod(MathMethod.ADD);
 		result.setCalculateUnit(this.calculateUnit);
 		return result;
 	}
