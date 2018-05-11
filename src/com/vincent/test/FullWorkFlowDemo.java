@@ -19,7 +19,7 @@ import com.vincent.workflow.WorkFlow;
 public class FullWorkFlowDemo {
 	private final static int MAX_COUPON_NUM = 3;
 
-	private List<Coupon> getCouponList() {
+	public List<Coupon> getCouponList() {
 		List<Coupon> couponList = new ArrayList<>();
 		Coupon c1 = new Coupon("全场券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
 				(unit) -> true);
@@ -34,9 +34,13 @@ public class FullWorkFlowDemo {
 				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("ap") > -1));
 		couponList.add(c3);
 
-		Coupon c4 = new Coupon("p券", CouponTypeEnum.CASH, null, new BigDecimal(12), new BigDecimal(31),
+		Coupon c4 = new Coupon("p券", CouponTypeEnum.CASH, null, new BigDecimal(12), new BigDecimal(35),
 				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("p") > -1));
 		couponList.add(c4);
+
+		Coupon c5 = new Coupon("全场券", CouponTypeEnum.DISCOUNT, new BigDecimal(5), null, new BigDecimal(50),
+				(unit) -> true);
+		couponList.add(c5);
 
 		return couponList;
 	}
@@ -52,7 +56,7 @@ public class FullWorkFlowDemo {
 		return productList;
 	}
 
-	private Result getCalculateResult(int[] tmpArray, List<Coupon> couponList, List<Product> productList) {
+	public Result getCalculateResult(int[] tmpArray, List<Coupon> couponList, List<Product> productList) {
 		WorkFlow workFlow = new WorkFlow();
 		workFlow.createCalculateUnits(productList);
 		List<Coupon> selectedCouponList = new ArrayList<>();
@@ -84,6 +88,10 @@ public class FullWorkFlowDemo {
 			return total;
 		}
 
+		public int[] getCouponArray() {
+			return couponArray;
+		}
+
 		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
@@ -110,8 +118,12 @@ public class FullWorkFlowDemo {
 				.map(tmpArray -> CompletableFuture
 						.supplyAsync(() -> demo.getCalculateResult(tmpArray, couponList, productList)))
 				.collect(Collectors.toList());
-		Optional<Result> leastResult = calculateFutures.stream().map(CompletableFuture::join)
-				.reduce((c1, c2) -> c1.getTotal().compareTo(c2.getTotal()) < 0 ? c1 : c2);
+		Optional<Result> leastResult = calculateFutures.stream().map(CompletableFuture::join).reduce((c1, c2) -> {
+			int compare = c1.getTotal().compareTo(c2.getTotal());
+			if (compare != 0)
+				return compare < 0 ? c1 : c2;
+			return c1.getCouponArray().length <= c2.getCouponArray().length ? c1 : c2;
+		});
 
 		leastResult.ifPresent(System.out::println);
 	}

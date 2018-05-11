@@ -272,6 +272,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			return result;
 		}
 
+		result.setCalculateUnit(checkCalculateUnit);
 		result.setResultCode(ResultCode.FAIL);
 		return result;
 	}
@@ -395,6 +396,7 @@ public class WorkStep implements Comparable<WorkStep> {
 				.reduce(BigDecimal.ZERO, BigDecimal::add);// currentValue之和的最大值
 		if (allCurrentValueSum.compareTo(minAfterDiscount) < 0) {
 			result.setResultCode(ResultCode.FAIL);
+			result.setCalculateUnit(checkCalculateUnit);
 			return result;
 		}
 		// 只要某个值不折扣时
@@ -405,6 +407,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			return result;
 		}
 
+		result.setCalculateUnit(checkCalculateUnit);
 		result.setResultCode(ResultCode.FAIL);
 		return result;
 	}
@@ -455,7 +458,8 @@ public class WorkStep implements Comparable<WorkStep> {
 			printFailMessage(result);
 			// 平摊失败
 			if (previousStep == null) {
-				System.out.println("失败结束");
+				if (test)
+					System.out.println("失败结束");
 				return;
 			}
 
