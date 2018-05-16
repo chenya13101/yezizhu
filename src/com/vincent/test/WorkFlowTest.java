@@ -35,7 +35,7 @@ class WorkFlowTest {
 		List<Product> productList = new ArrayList<>();
 		Product p2 = new Product("coffee", new BigDecimal(47));
 		productList.add(p2);
-		
+
 		Product p1 = new Product("apple", new BigDecimal(19));
 		productList.add(p1);
 		for (int i = 0; i < 6; i++) {
@@ -75,10 +75,10 @@ class WorkFlowTest {
 
 		// 模拟创建产品
 		List<Product> productList = new ArrayList<>();
-		
+
 		Product p2 = new Product("coffee", new BigDecimal(47));
 		productList.add(p2);
-		
+
 		Product p1 = new Product("apple", new BigDecimal(23));
 		productList.add(p1);
 		Product p4 = new Product("yapu", new BigDecimal(10));
@@ -337,6 +337,57 @@ class WorkFlowTest {
 		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		assertEquals(48, resultSum.doubleValue());
+	}
+
+	/**
+	 * 场景描述： 两张折扣券，第一张如果全平摊第二张就无法使用了； 但是也无法平摊到第二张范围内商品中的单独任意一个上(即使加上了范围外的商品)
+	 */
+	@Test
+	void test10() {
+		// 模拟创建优惠券
+		List<Coupon> couponList = new ArrayList<>();
+		Coupon c1 = new Coupon("A001", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
+				(unit) -> unit.getProductCode() != null
+						&& (unit.getProductCode().indexOf("a") > -1 || unit.getProductCode().indexOf("c") > -1));
+		couponList.add(c1);
+		Coupon c2 = new Coupon("A002", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(30),
+				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("ap") > -1));
+		couponList.add(c2);
+
+		// 模拟创建产品
+		List<Product> productList = new ArrayList<>();
+		Product p2 = new Product("coffee", new BigDecimal(20));
+		productList.add(p2);
+
+		Product p7 = new Product("coffee", new BigDecimal(20));
+		productList.add(p7);
+
+		Product p1 = new Product("apple", new BigDecimal(6));
+		productList.add(p1);
+
+		Product p4 = new Product("apple", new BigDecimal(6));
+		productList.add(p4);
+
+		Product p13 = new Product("apple", new BigDecimal(9));
+		productList.add(p13);
+
+		Product p5 = new Product("apple", new BigDecimal(9));
+		productList.add(p5);
+
+		Product p14 = new Product("apple", new BigDecimal(3));
+		productList.add(p14);
+
+		// 实际的工作流
+		WorkFlow workFlow = new WorkFlow();
+		List<CalculateUnit> calculateUnits = workFlow.createCalculateUnits(productList);
+		workFlow.createWorkSteps(couponList, calculateUnits);
+		workFlow.start();
+		workFlow.showResult();
+
+		// 验证结果
+		BigDecimal resultSum = calculateUnits.stream().map(CalculateUnit::getCurrentValue).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		assertEquals(new BigDecimal(53).doubleValue(), resultSum.doubleValue());
 	}
 
 }

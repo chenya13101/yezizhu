@@ -1,5 +1,6 @@
 package com.vincent.bean;
 
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map.Entry;
@@ -7,9 +8,10 @@ import java.util.TreeMap;
 
 import com.vincent.workflow.WorkStep;
 
+
 public class CalculateUnit {
 
-	// TODO 有没有必要保存修改之前的值 beforeValue
+	// 有没有必要保存修改之前的值 beforeValue
 	private BigDecimal max;
 
 	private BigDecimal min;

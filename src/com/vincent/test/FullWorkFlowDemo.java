@@ -21,32 +21,34 @@ public class FullWorkFlowDemo {
 
 	public List<Coupon> getCouponList() {
 		List<Coupon> couponList = new ArrayList<>();
-		Coupon c1 = new Coupon("全场券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
+		Coupon c1 = new Coupon("全场券1", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
 				(unit) -> true);
 		couponList.add(c1);
 
-		Coupon c2 = new Coupon("a和c券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
+		Coupon c2 = new Coupon("全场券2", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(50),
 				(unit) -> unit.getProductCode() != null
 						&& (unit.getProductCode().indexOf("a") > -1 || unit.getProductCode().indexOf("c") > -1));
 		couponList.add(c2);
 
-		Coupon c3 = new Coupon("ap券", CouponTypeEnum.CASH, null, new BigDecimal(10), new BigDecimal(30),
-				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("ap") > -1));
-		couponList.add(c3);
+		// Coupon c3 = new Coupon("ap券", CouponTypeEnum.CASH, null, new BigDecimal(10),
+		// new BigDecimal(30),
+		// (unit) -> unit.getProductCode() != null &&
+		// (unit.getProductCode().indexOf("ap") > -1));
+		// couponList.add(c3);
 
-		Coupon c4 = new Coupon("p券", CouponTypeEnum.CASH, null, new BigDecimal(12), new BigDecimal(35),
+		Coupon c4 = new Coupon("ap券", CouponTypeEnum.CASH, null, new BigDecimal(12), new BigDecimal(30),
 				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("p") > -1));
 		couponList.add(c4);
 
-		Coupon c5 = new Coupon("全场券", CouponTypeEnum.DISCOUNT, new BigDecimal(5), null, new BigDecimal(50),
-				(unit) -> true);
+		Coupon c5 = new Coupon("p券3", CouponTypeEnum.DISCOUNT, new BigDecimal(5), null, new BigDecimal(30),
+				(unit) -> unit.getProductCode() != null && (unit.getProductCode().indexOf("p") > -1));
 		couponList.add(c5);
 		return couponList;
 	}
 
 	public List<Product> getProductList() {
 		List<Product> productList = new ArrayList<>();
-		Product p2 = new Product("coffee", new BigDecimal(50));
+		Product p2 = new Product("coffee", new BigDecimal(47));
 		productList.add(p2);
 
 		Product p1 = new Product("apple", new BigDecimal(23));
@@ -115,6 +117,7 @@ public class FullWorkFlowDemo {
 		for (int i = 1; i <= size; i++) {
 			list.addAll(sequenceGenerator.getSequences(couponSize, i));
 		}
+		// list.add(new int[] { 1, 2, 5 });
 
 		List<CompletableFuture<Result>> calculateFutures = list.stream()
 				.map(tmpArray -> CompletableFuture
