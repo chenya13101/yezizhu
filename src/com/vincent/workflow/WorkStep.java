@@ -414,7 +414,7 @@ public class WorkStep implements Comparable<WorkStep> {
 			return result;
 		}
 		// 只要某个值不折扣时
-		List<CalculateUnit> excludeList = reDiscountByRemoveOneUnit(discount, sortedUnitList, minAfterDiscount);
+		List<CalculateUnit> excludeList = getCanRemoveUnitsForReDiscount(discount, sortedUnitList, minAfterDiscount);
 		if (excludeList != null && excludeList.size() > 0) {
 			reDiscountExcludeIndexArray(discount, sortedUnitList, excludeList);
 			result.setResultCode(ResultCode.SUCCESS);
@@ -444,9 +444,14 @@ public class WorkStep implements Comparable<WorkStep> {
 		}
 	}
 
-	// TODO 未来可以引申为排除多个元素
-	private List<CalculateUnit> reDiscountByRemoveOneUnit(BigDecimal discount, List<CalculateUnit> containedUnitList,
-			BigDecimal minAfterDiscount) {
+	/**
+	 * 如果在step1内不对step2包含的某个产品打折，是不是就可以满足step2的使用条件。如果1到2个找出这些产品
+	 */
+	private List<CalculateUnit> getCanRemoveUnitsForReDiscount(BigDecimal discount,
+			List<CalculateUnit> containedUnitList, BigDecimal minAfterDiscount) {
+		if (containedUnitList.size() == 1) // 不能够排除仅有的一个元素，那么step1等于没有使用了
+			return null;
+
 		BigDecimal afterDiscount;
 		List<CalculateUnit> result = new ArrayList<>();
 		for (int i = 0; i < containedUnitList.size(); i++) {
@@ -462,6 +467,26 @@ public class WorkStep implements Comparable<WorkStep> {
 				return result;
 			}
 		}
+
+		if (containedUnitList.size() == 2)
+			return null;
+		// 使用第一个元素(最小的)与之后的其它单元的currentValue不折扣，如果满足条件则返回
+		for (int i = 1; i < containedUnitList.size(); i++) {
+			final int index = i;
+			afterDiscount = containedUnitList.stream().map(unit -> {
+				if (containedUnitList.indexOf(unit) == index || containedUnitList.indexOf(unit) == 0) {
+					return unit.getCurrentValue();
+				}
+				return unit.getCurrentValue().multiply(discount).divide(TEN, NUMS_AFTER_POINT, RoundingMode.HALF_UP);
+			}).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+			if (afterDiscount.compareTo(minAfterDiscount) >= 0) {
+				result.add(containedUnitList.get(index));
+				result.add(containedUnitList.get(0));
+				return result;
+			}
+		}
+
 		return null;
 	}
 
