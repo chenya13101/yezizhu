@@ -330,7 +330,7 @@ public class WorkStep implements Comparable<WorkStep> {
 				BigDecimal sum = firstUnit.getCurrentValue().add(secondUnit.getCurrentValue());
 				if (sum.compareTo(min) >= 0) {
 					result.add(firstUnit);
-					result.add(secondUnit); // FIXME 测试是否正确,似乎没有作用啊
+					result.add(secondUnit);
 					break;
 				}
 			}
