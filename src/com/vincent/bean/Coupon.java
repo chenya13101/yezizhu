@@ -10,7 +10,7 @@ public class Coupon {
 
 	private String name;
 
-	private CouponTypeEnum couponTypeEnum;
+	private CouponTypeEnum couponTypeEnum; // TODO 优惠券类型，新版本会出现许多不一致的属性，难度增加
 
 	private BigDecimal discount; // 折扣
 

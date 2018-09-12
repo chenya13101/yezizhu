@@ -1,96 +1,77 @@
 package com.vincent.workflow;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 
-import com.vincent.bean.Coupon;
+import com.vincent.bean.Commodity;
+import com.vincent.bean.CouponCode;
 
-public class WorkStep implements Comparable<WorkStep> {
+/**
+ * 用于执行券码的计算逻辑
+ * 
+ * @author WenSen
+ * @date 2018年9月12日 下午6:53:01
+ *
+ */
+public class WorkStep {
 
-	private String name;
+	// private String name;
 
-	private final static BigDecimal TEN = new BigDecimal(10);
+	// private final static BigDecimal TEN = new BigDecimal(10);
 
-	private final static int NUMS_AFTER_POINT = 4;
+	// private final static int NUMS_AFTER_POINT = 4;
 
-	private BigDecimal totalSale = BigDecimal.ZERO;
+	// private BigDecimal totalSale = BigDecimal.ZERO;
 
-	private Map<String, BigDecimal> goodsCodePriceMap = new HashMap<>();
+	// private Map<String, BigDecimal> goodsCodePriceMap = new HashMap<>();
 
-	private Coupon coupon;
+	private CouponCode couponCode;
+	private List<Commodity> commodityList; // 只保存本优惠券范围内的商品,可以修改值，但是不能影响其它flow
 
-	private WorkStep nextStep;
+	// private WorkStep nextStep;
 
-	private WorkStep previousStep;
+	// public WorkStep getNextStep() {
+	// return nextStep;
+	// }
 
-	AtomicInteger useCount = new AtomicInteger(0);// 为了避免死循环，同时又不循环求中值而采取的折中方法
-	final int maxUseCount = 2;
+	// public void setNextStep(WorkStep nextStep) {
+	// this.nextStep = nextStep;
+	// }
 
-	public WorkStep getNextStep() {
-		return nextStep;
+	public List<Commodity> getCommodityList() {
+		return commodityList;
 	}
 
-	public void setNextStep(WorkStep nextStep) {
-		this.nextStep = nextStep;
+	public void setCommodityList(List<Commodity> commodityList) {
+		this.commodityList = commodityList;
 	}
 
-	public WorkStep getPreviousStep() {
-		return previousStep;
+	public void setCouponCode(CouponCode couponCode) {
+		this.couponCode = couponCode;
 	}
 
-	public void setPreviousStep(WorkStep previousStep) {
-		this.previousStep = previousStep;
+	public CouponCode getCouponCode() {
+		return couponCode;
 	}
 
-	public Coupon getCoupon() {
-		return coupon;
-	}
+	// public void setCouponCode(CouponCode couponCode) { this.couponCode =
+	// couponCode; }
 
-	public void setCoupon(Coupon coupon) {
-		this.coupon = coupon;
-	}
-
-	public static BigDecimal getTen() {
-		return TEN;
-	}
-
-	public static int getNumsAfterPoint() {
-		return NUMS_AFTER_POINT;
-	}
+	// private boolean hasNext() {
+	// return nextStep != null;
+	//
+	// }
+	//
+	// public WorkStep getLast() {
+	// WorkStep current = this;
+	// while (current.hasNext()) {
+	// current = this.getNextStep();
+	// }
+	// return current;
+	//
+	// }
 
 	public void run() {
-
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public int compareTo(WorkStep o) {
-		return this.getName().compareTo(o.getName());
-	}
-
-	public BigDecimal getTotalSale() {
-		return totalSale;
-	}
-
-	public void setTotalSale(BigDecimal totalSale) {
-		this.totalSale = totalSale;
-	}
-
-	public Map<String, BigDecimal> getGoodsCodePriceMap() {
-		return goodsCodePriceMap;
-	}
-
-	public void setGoodsCodePriceMap(Map<String, BigDecimal> goodsCodePriceMap) {
-		this.goodsCodePriceMap = goodsCodePriceMap;
+		// TODO 计算
 	}
 
 }

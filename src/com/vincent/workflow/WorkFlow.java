@@ -1,41 +1,37 @@
 package com.vincent.workflow;
 
 import java.util.List;
+import static java.util.stream.Collectors.*;
 
-import com.vincent.DataFactory;
-import com.vincent.bean.Coupon;
+import java.math.BigDecimal;
+
+import com.vincent.bean.Commodity;
+import com.vincent.bean.CouponGroup;
+import com.vincent.bean.CouponCode;
 
 public class WorkFlow {
 
-	List<WorkStep> workSteps;
+	private List<WorkStep> workSteps;
 
-	public static void main(String[] args) {
-		List<Coupon> couponList = DataFactory.getCoupons();
-		if (couponList == null)
-			return;
+	private List<Commodity> commodityList; // TODO 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity>
+											// commodityList
 
-		//List<Product> productList = DataFactory.getProducts();
-		WorkFlow workFlow = new WorkFlow();
-
-		workFlow.start();
-		workFlow.showResult();
+	// TODO 要保证不受其它flow干扰
+	public WorkFlow(List<WorkStep> workSteps, List<Commodity> commodityList) {
+		// TODO 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity> commodityList
+		this.workSteps = workSteps;
+		this.commodityList = commodityList;
 	}
 
-	private void showResult() {
-		// TODO Auto-generated method stub
-		
+	public CouponGroup getResult() {
+		List<CouponCode> couponCodeList = workSteps.stream().map(WorkStep::getCouponCode).collect(toList());
+		BigDecimal total = commodityList.stream().map(Commodity::getPromotePrice).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		return new CouponGroup(couponCodeList, total);
 	}
 
 	public void start() {
-		this.getWorkSteps().get(0).run();
-	}
-
-	public List<WorkStep> getWorkSteps() {
-		return workSteps;
-	}
-
-	public void setWorkSteps(List<WorkStep> workSteps) {
-		this.workSteps = workSteps;
+		workSteps.forEach(WorkStep::run);// TODO 需要确保是按照顺序来运行的
 	}
 
 }

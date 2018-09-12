@@ -13,6 +13,7 @@ public class Commodity {
 
 	private String code;
 	private BigDecimal price;
+	private BigDecimal promotePrice;
 
 	public Commodity(String code, BigDecimal price) {
 		super();
@@ -34,6 +35,14 @@ public class Commodity {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public BigDecimal getPromotePrice() {
+		return promotePrice;
+	}
+
+	public void setPromotePrice(BigDecimal promotePrice) {
+		this.promotePrice = promotePrice;
 	}
 
 }
