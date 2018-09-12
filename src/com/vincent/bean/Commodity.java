@@ -2,12 +2,19 @@ package com.vincent.bean;
 
 import java.math.BigDecimal;
 
-public class Product {
+/**
+ * 作为参数，被外部调用者传入
+ * 
+ * @author WenSen
+ * @date 2018年9月12日 下午6:02:26
+ *
+ */
+public class Commodity {
 
 	private String code;
 	private BigDecimal price;
 
-	public Product(String code, BigDecimal price) {
+	public Commodity(String code, BigDecimal price) {
 		super();
 		this.price = price;
 		this.code = code;

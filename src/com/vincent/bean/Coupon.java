@@ -1,7 +1,6 @@
 package com.vincent.bean;
 
 import java.math.BigDecimal;
-import java.util.function.Predicate;
 
 import com.vincent.common.CouponTypeEnum;
 
@@ -9,25 +8,28 @@ public class Coupon {
 
 	private String code;
 
+	private String name;
+
 	private CouponTypeEnum couponTypeEnum;
 
-	private BigDecimal discount;
+	private BigDecimal discount; // 折扣
 
-	private BigDecimal amount;
+	private BigDecimal amount;// 抵扣现金额
 
-	private BigDecimal fullElement;
+	private BigDecimal fullElement; // 需要满足的满减金额
 
-	private Predicate<CalculateUnit> filterRule;
+	private PromotionRange promotionRange;
 
-	public Coupon(String code, CouponTypeEnum couponTypeEnum, BigDecimal discount, BigDecimal amount,
-			BigDecimal fullElement, Predicate<CalculateUnit> filterRule) {
+	public Coupon(String code, String name, CouponTypeEnum couponTypeEnum, BigDecimal discount, BigDecimal amount,
+			BigDecimal fullElement, PromotionRange promotionRange) {
 		super();
 		this.code = code;
+		this.name = name;
 		this.couponTypeEnum = couponTypeEnum;
 		this.discount = discount;
 		this.amount = amount;
 		this.fullElement = fullElement;
-		this.filterRule = filterRule;
+		this.promotionRange = promotionRange;
 	}
 
 	public String getCode() {
@@ -70,12 +72,20 @@ public class Coupon {
 		this.fullElement = fullElement;
 	}
 
-	public Predicate<CalculateUnit> getFilterRule() {
-		return filterRule;
+	public String getName() {
+		return name;
 	}
 
-	public void setFilterRule(Predicate<CalculateUnit> filterRule) {
-		this.filterRule = filterRule;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public PromotionRange getPromotionRange() {
+		return promotionRange;
+	}
+
+	public void setPromotionRange(PromotionRange promotionRange) {
+		this.promotionRange = promotionRange;
 	}
 
 }

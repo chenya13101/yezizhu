@@ -7,48 +7,29 @@ package com.vincent.common;
  *
  */
 public enum CouponTypeEnum {
-	DISCOUNT("折扣券", 1), CASH("代金券", 2);
+	DISCOUNT("折扣券", 1, "ZK"),
+	CASH("代金券", 2, "DJ"),
+	RED_PACKET("红包", 3, "HB");
 
 	private String name;
 	private int index;
+	private String prefix;
 
-	private CouponTypeEnum(String name, int index) {
+	private CouponTypeEnum(String name, int index, String prefix) {
 		this.name = name;
 		this.index = index;
-	}
-
-	// 普通方法
-	public static String getName(int index) {
-		for (CouponTypeEnum c : CouponTypeEnum.values()) {
-			if (c.getIndex() == index) {
-				return c.name;
-			}
-		}
-		return null;
-	}
-
-	public static CouponTypeEnum getEnumByIndex(int index) {
-		for (CouponTypeEnum c : CouponTypeEnum.values()) {
-			if (c.getIndex() == index) {
-				return c;
-			}
-		}
-		return null;
+		this.prefix = prefix;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getPrefix() {
+		return prefix;
 	}
 
 	public int getIndex() {
 		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
 	}
 }
