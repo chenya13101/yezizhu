@@ -11,6 +11,17 @@ public class PromotionRange {
 
 	List<PromotionCommodity> commodityList;
 
+	public PromotionRange(PromotionRangeTypeEnum type) {
+		super();
+		this.type = type;
+	}
+
+	public PromotionRange(PromotionRangeTypeEnum type, List<PromotionCommodity> commodityList) {
+		super();
+		this.type = type;
+		this.commodityList = commodityList;
+	}
+
 	public PromotionRangeTypeEnum getType() {
 		return type;
 	}
