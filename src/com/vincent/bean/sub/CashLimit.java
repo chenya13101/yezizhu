@@ -7,7 +7,13 @@ import com.vincent.bean.UseLimit;
 public class CashLimit extends UseLimit {
 	private BigDecimal minRequire;
 
-	private BigDecimal amount;
+	private BigDecimal maxSale;
+
+	public CashLimit(BigDecimal minRequire, BigDecimal maxSale) {
+		super();
+		this.minRequire = minRequire;
+		this.maxSale = maxSale;
+	}
 
 	public BigDecimal getMinRequire() {
 		return minRequire;
@@ -17,12 +23,12 @@ public class CashLimit extends UseLimit {
 		this.minRequire = minRequire;
 	}
 
-	public BigDecimal getAmount() {
-		return amount;
+	public BigDecimal getMaxSale() {
+		return maxSale;
 	}
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
+	public void setMaxSale(BigDecimal maxSale) {
+		this.maxSale = maxSale;
 	}
 
 }
