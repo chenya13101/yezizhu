@@ -1,9 +1,11 @@
 package com.vincent.workflow;
 
 import java.util.List;
+import static java.util.stream.Collectors.toList;
 
 import com.vincent.bean.Commodity;
 import com.vincent.bean.CouponCode;
+import com.vincent.common.PromotionRangeTypeEnum;
 
 public class WorkFlowFactory {
 
@@ -17,11 +19,23 @@ public class WorkFlowFactory {
 	 */
 	public static List<WorkFlow> buildWorkFlow(List<Commodity> commodityList, List<CouponCode> couponCodeList) {
 		// TODO
+		if (couponCodeList.size() == 1) {
+			// TODO 只有一张券的时候可以简单处理,甚至可以在调用这个方法的地方单独写if
+			return null;
+		}
 
-		List<CouponCode> promoteCommodityCodeList = null;
-		List<CouponCode> promoteAllList = null;
+		List<CouponCode> promoteCommodityList = filterCodeListByPromotionRange(couponCodeList,
+				PromotionRangeTypeEnum.COMMODITY);
+		List<CouponCode> promoteAllList = filterCodeListByPromotionRange(couponCodeList, PromotionRangeTypeEnum.ALL);
 
 		return null;
+	}
+
+	private static List<CouponCode> filterCodeListByPromotionRange(List<CouponCode> couponCodeList,
+			PromotionRangeTypeEnum enumParam) {
+		return couponCodeList.stream()
+				.filter(code -> enumParam.getIndex() == code.getCoupon().getPromotionRange().getType())
+				.collect(toList());
 	}
 
 }

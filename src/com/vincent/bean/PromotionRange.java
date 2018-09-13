@@ -3,30 +3,29 @@ package com.vincent.bean;
 import java.util.List;
 
 import com.vincent.bean.sub.PromotionCommodity;
-import com.vincent.common.PromotionRangeTypeEnum;
 
 public class PromotionRange {
 
-	PromotionRangeTypeEnum type;
+	private int type; // PromotionRangeTypeEnum getIndex
 
-	List<PromotionCommodity> commodityList;
+	private List<PromotionCommodity> commodityList;
 
-	public PromotionRange(PromotionRangeTypeEnum type) {
+	public PromotionRange(int type) {
 		super();
 		this.type = type;
 	}
 
-	public PromotionRange(PromotionRangeTypeEnum type, List<PromotionCommodity> commodityList) {
+	public PromotionRange(int type, List<PromotionCommodity> commodityList) {
 		super();
 		this.type = type;
 		this.commodityList = commodityList;
 	}
 
-	public PromotionRangeTypeEnum getType() {
+	public int getType() {
 		return type;
 	}
 
-	public void setType(PromotionRangeTypeEnum type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
