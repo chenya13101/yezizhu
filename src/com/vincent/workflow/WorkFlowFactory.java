@@ -28,6 +28,9 @@ public class WorkFlowFactory {
 				PromotionRangeTypeEnum.COMMODITY);
 		List<CouponCode> promoteAllList = filterCodeListByPromotionRange(couponCodeList, PromotionRangeTypeEnum.ALL);
 
+		// TODO 每个WorkFlow都是一个优惠券组合,每一个workStep都是用来计算这个步骤的优惠券的优惠
+		// TODO 根据产品的设计，实现组装code为 step,然后是flow
+
 		return null;
 	}
 
