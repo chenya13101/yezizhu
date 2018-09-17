@@ -6,7 +6,7 @@ import static java.util.stream.Collectors.toList;
 import com.vincent.bean.Commodity;
 import com.vincent.bean.CouponCode;
 import com.vincent.bean.WorkFlow;
-import com.vincent.common.PromotionRangeTypeEnum;
+import com.vincent.bean.enums.PromotionRangeTypeEnum;
 
 public class WorkFlowFactory {
 

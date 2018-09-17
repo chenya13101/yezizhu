@@ -1,4 +1,4 @@
-package com.vincent.common;
+package com.vincent.bean.enums;
 
 public enum PromotionRangeTypeEnum {
 	COMMODITY("商品券", 1),

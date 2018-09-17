@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import com.vincent.bean.enums.PromotionRangeTypeEnum;
 import com.vincent.common.Constant;
-import com.vincent.common.PromotionRangeTypeEnum;
 
 /**
  * 枚举类型不用改变，甚至不需要枚举类实现任何接口

@@ -1,11 +1,11 @@
 package com.vincent.bean;
 
+import com.vincent.bean.enums.CouponTypeEnum;
 import com.vincent.bean.inwardType.UseLimitInward;
 import com.vincent.bean.sub.CashLimit;
 import com.vincent.bean.sub.DiscountLimit;
 import com.vincent.bean.sub.RedPacketLimit;
 import com.vincent.common.Constant;
-import com.vincent.common.CouponTypeEnum;
 import com.vincent.util.EnumUtil;
 
 public class Coupon {

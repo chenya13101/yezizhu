@@ -40,6 +40,12 @@ public class WorkStep {
 		return commodityList;
 	}
 
+	public WorkStep(CouponCode couponCode, List<Commodity> commodityList) {
+		super();
+		this.couponCode = couponCode;
+		this.commodityList = commodityList;
+	}
+
 	public void setCommodityList(List<Commodity> commodityList) {
 		this.commodityList = commodityList;
 	}
