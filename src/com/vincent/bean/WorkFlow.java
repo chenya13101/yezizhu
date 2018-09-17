@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 
 public class WorkFlow {
 
-	private static Map<TypeRangeEnum, List<TypeRangeEnum>> conflictMap;
+	private static final Map<TypeRangeEnum, List<TypeRangeEnum>> conflictMap;
 	static {
 		// 根据现有规则初始化得到的一个冲突map,用于 isConflict()方法，规则由产品决定
 		conflictMap = new HashMap<>();
@@ -51,7 +51,7 @@ public class WorkFlow {
 	private Set<TypeRangeEnum> codeTypeSet = new HashSet<>(); // FIXME 似乎可以删掉，这个Enum似乎也可以删
 
 	public WorkFlow(List<Commodity> commodityList) {
-		// TODO 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity> commodityList
+		// 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity> commodityList
 		this.commodityList = commodityList.stream().map(t -> {
 			try {
 				return (Commodity) t.clone();
@@ -107,7 +107,7 @@ public class WorkFlow {
 	public boolean addCouponCode(CouponCode codeParam) {
 		// if (isConflict(codeParam)) {
 		// return false;
-		// } TODO 将是否冲突的方法对外暴露
+		// } TODO 将是否冲突的方法对外暴露,需要防范危险.
 
 		couponCodeList.add(codeParam);
 		workSteps.add(new WorkStep(codeParam, filterCommodityForCode(codeParam)));
