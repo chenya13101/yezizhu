@@ -2,6 +2,7 @@ package com.vincent.bean;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,7 +62,12 @@ public class WorkFlow {
 		}).collect(Collectors.toList());
 	}
 
-	// TODO 是否冲突
+	/**
+	 * 如果冲突了，不能加入当前workFlow
+	 * 
+	 * @param codeParam
+	 * @return true：冲突; false：不冲突
+	 */
 	public boolean isConflict(CouponCode codeParam) {
 		if (couponCodeList.size() == 0) {
 			return false;
@@ -69,24 +75,18 @@ public class WorkFlow {
 
 		TypeRangeEnum inputEnum = getTypeRangeEnum(codeParam);
 		switch (inputEnum) {
+		case RED_ALL:
 		case CASH_ALL:
-			if (codeTypeSet.contains(TypeRangeEnum.RED_ALL)) {
-				return false;
-			}
-
-			break;
-		case CASH_COMMODITY:
-
-			break;
 		case DISCOUNT_ALL:
-
+			List<TypeRangeEnum> conflictEnumList = conflictMap.get(inputEnum);
+			return !Collections.disjoint(conflictEnumList, codeTypeSet);
+		case CASH_COMMODITY:
+			// TODO 是否冲突
 			break;
 		case DISCOUNT_COMMODITY:
 
 			break;
-		case RED_ALL:
 
-			break;
 		case RED_COMMODITY:
 			break;
 		default:
@@ -94,7 +94,7 @@ public class WorkFlow {
 		}
 
 		// TODO 是否还有其它的要求
-		return false;
+		return true;
 	}
 
 	/**
