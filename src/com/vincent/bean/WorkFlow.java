@@ -1,13 +1,11 @@
-package com.vincent.workflow;
+package com.vincent.bean;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.*;
 
 import java.math.BigDecimal;
-
-import com.vincent.bean.Commodity;
-import com.vincent.bean.CouponGroup;
-import com.vincent.bean.CouponCode;
 
 public class WorkFlow {
 
@@ -21,6 +19,15 @@ public class WorkFlow {
 		// TODO 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity> commodityList
 		this.workSteps = workSteps;
 		this.commodityList = commodityList;
+
+		this.commodityList = commodityList.stream().map(t -> {
+			try {
+				return (Commodity) t.clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+				return new Commodity(t.getCode(), t.getPrice());
+			}
+		}).collect(Collectors.toList());
 	}
 
 	public CouponGroup getResult() {

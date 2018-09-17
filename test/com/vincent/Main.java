@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.toList;
 import com.vincent.bean.Commodity;
 import com.vincent.bean.CouponCode;
 import com.vincent.bean.CouponGroup;
-import com.vincent.workflow.WorkFlow;
+import com.vincent.bean.WorkFlow;
 import com.vincent.workflow.WorkFlowFactory;
 
 public class Main {

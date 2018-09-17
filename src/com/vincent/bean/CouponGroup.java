@@ -12,6 +12,7 @@ public class CouponGroup {
 	 */
 	private BigDecimal total;
 
+	// TODO 有没有必要添加其它属性
 	public CouponGroup(List<CouponCode> couponCodeList, BigDecimal total) {
 		super();
 		this.couponCodeList = couponCodeList;

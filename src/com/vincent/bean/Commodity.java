@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @date 2018年9月12日 下午6:02:26
  *
  */
-public class Commodity {
+public class Commodity implements Cloneable {
 
 	private String code;
 	private BigDecimal price;
@@ -45,4 +45,8 @@ public class Commodity {
 		this.promotePrice = promotePrice;
 	}
 
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }
