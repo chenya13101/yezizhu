@@ -22,16 +22,22 @@ public class WorkFlow {
 
 	private static Map<TypeRangeEnum, List<TypeRangeEnum>> conflictMap;
 	static {
-		// 根据现有规则初始化得到的一个冲突map,用于 isConflict()方法
+		// 根据现有规则初始化得到的一个冲突map,用于 isConflict()方法，规则由产品决定
 		conflictMap = new HashMap<>();
 		conflictMap.put(TypeRangeEnum.CASH_ALL, Arrays.asList(TypeRangeEnum.RED_ALL, TypeRangeEnum.RED_COMMODITY,
 				TypeRangeEnum.DISCOUNT_ALL, TypeRangeEnum.DISCOUNT_COMMODITY, TypeRangeEnum.CASH_ALL));
 		conflictMap.put(TypeRangeEnum.CASH_COMMODITY, Arrays.asList(TypeRangeEnum.RED_ALL, TypeRangeEnum.RED_COMMODITY,
 				TypeRangeEnum.DISCOUNT_ALL, TypeRangeEnum.DISCOUNT_COMMODITY));
 
-		conflictMap.put(TypeRangeEnum.RED_ALL,
-				Arrays.asList(TypeRangeEnum.RED_ALL, TypeRangeEnum.DISCOUNT_ALL, TypeRangeEnum.DISCOUNT_COMMODITY));
+		conflictMap.put(TypeRangeEnum.RED_ALL, Arrays.asList(TypeRangeEnum.CASH_ALL, TypeRangeEnum.CASH_COMMODITY,
+				TypeRangeEnum.DISCOUNT_ALL, TypeRangeEnum.DISCOUNT_COMMODITY));
+		conflictMap.put(TypeRangeEnum.RED_COMMODITY, Arrays.asList(TypeRangeEnum.CASH_ALL, TypeRangeEnum.CASH_COMMODITY,
+				TypeRangeEnum.DISCOUNT_ALL, TypeRangeEnum.DISCOUNT_COMMODITY));
 
+		conflictMap.put(TypeRangeEnum.DISCOUNT_ALL, Arrays.asList(TypeRangeEnum.RED_ALL, TypeRangeEnum.RED_COMMODITY,
+				TypeRangeEnum.CASH_ALL, TypeRangeEnum.CASH_COMMODITY, TypeRangeEnum.DISCOUNT_ALL));
+		conflictMap.put(TypeRangeEnum.DISCOUNT_COMMODITY, Arrays.asList(TypeRangeEnum.RED_ALL,
+				TypeRangeEnum.RED_COMMODITY, TypeRangeEnum.CASH_ALL, TypeRangeEnum.CASH_COMMODITY));
 	}
 
 	private List<WorkStep> workSteps = new ArrayList<>();
