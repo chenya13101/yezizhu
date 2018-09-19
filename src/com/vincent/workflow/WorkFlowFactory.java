@@ -2,17 +2,21 @@ package com.vincent.workflow;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 
 import com.vincent.bean.Commodity;
 import com.vincent.bean.CouponCode;
 import com.vincent.bean.WorkFlow;
 import com.vincent.bean.enums.CouponTypeEnum;
+import com.vincent.bean.enums.PromotionRangeTypeEnum;
+import com.vincent.bean.sub.PromotionCommodity;
 import com.vincent.common.Constant;
 import com.vincent.util.EnumUtil;
 
@@ -37,7 +41,7 @@ public class WorkFlowFactory {
 		// TODO
 		if (couponCodeList.size() == 1) {
 			// TODO 只有一张券的时候可以简单处理,甚至可以在调用这个方法的地方单独写if
-			return null;
+			return buildFlowForSingleCode(couponCodeList.get(0), commodityList);
 		}
 
 		// TODO couponCodeList是否有必要去除重复的优惠券，或者是在某些情况下需要去除重复种类的券码
@@ -53,13 +57,13 @@ public class WorkFlowFactory {
 			CouponTypeEnum typeEnum = EnumUtil.getEnumObject(CouponTypeEnum.class, type -> type.getIndex() == key);
 			switch (typeEnum) {
 			case CASH:
-				resultWorkFlows.addAll(buildCashWorkFlows(rangeCodeMap));
+				resultWorkFlows.addAll(buildCashWorkFlows(rangeCodeMap, commodityList));
 				break;
 			case DISCOUNT:
-				resultWorkFlows.addAll(buildDiscountWorkFlows(rangeCodeMap));
+				resultWorkFlows.addAll(buildDiscountWorkFlows(rangeCodeMap, commodityList));
 				break;
 			case RED_PACKET:
-				resultWorkFlows.addAll(buildRedPacketWorkFlows(rangeCodeMap));
+				resultWorkFlows.addAll(buildRedPacketWorkFlows(rangeCodeMap, commodityList));
 				break;
 			default:
 				throw new IllegalArgumentException(Constant.INVALID_INDEX);
@@ -82,17 +86,33 @@ public class WorkFlowFactory {
 
 	}
 
-	private static List<WorkFlow> buildRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap) {
+	/**
+	 * 如果只有一张优惠券，可以简单处理
+	 */
+	private static List<WorkFlow> buildFlowForSingleCode(CouponCode codeParam, List<Commodity> commodityList) {
+		WorkFlow flow = new WorkFlow(commodityList);
+		flow.addCouponCode(codeParam, filterCommodityForCode(codeParam, commodityList));
+		return Collections.singletonList(flow);
+	}
+
+	private static List<WorkFlow> buildRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
+			List<Commodity> commodityList) {
+		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
+		List<CouponCode> AllCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
+
+		// TODO 111
+		List<WorkFlow> flows = buildCommodityFlows(commodityList, commodityCodeList);
+		return flows;
+	}
+
+	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
+			List<Commodity> commodityList) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static List<WorkFlow> buildCashWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap) {
+	private static List<WorkFlow> buildCashWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
+			List<Commodity> commodityList) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -106,21 +126,33 @@ public class WorkFlowFactory {
 		for (int i = 0; i < size; i++) {
 			WorkFlow workFlow = new WorkFlow(commodityList);
 			CouponCode out = promoteCommodityList.get(i);
-			if (!workFlow.addCouponCode(out))
-				continue;
+			List<Commodity> outCommodities = filterCommodityForCode(out, commodityList);
 
 			for (int j = i + 1; j < size; j++) {
 				CouponCode inner = promoteCommodityList.get(j);
-				if (!workFlow.isConflict(inner)) {
-					workFlow.addCouponCode(inner);
+				List<Commodity> innerCommodities = filterCommodityForCode(inner, commodityList);
+				// 判断:优惠券商品范围没有交叉才能叠加使用
+				if (Collections.disjoint(outCommodities, innerCommodities)) {
+					workFlow.addCouponCode(inner, outCommodities);
 				}
 			}
 			workFlowList.add(workFlow);
 		}
-		// TODO 根据产品的设计，实现组装code为 step,然后是flow
-		// TODO 做一个代理类来管理 couponCode与优惠范围内的具体商品是不是更好一点.
-		// TODO 需要处理好在哪儿组装成 workStep，在哪儿把commodityList分开
+		// 根据产品的设计，实现组装code为 step,然后组装成flow
 		return workFlowList;
 	}
 
+	private static List<Commodity> filterCommodityForCode(CouponCode codeParam, List<Commodity> commodityList) {
+		// 如果是全场券,返回全部商品
+		int codeRangeType = codeParam.getCoupon().getPromotionRange().getType();
+		if (codeRangeType == PromotionRangeTypeEnum.ALL.getIndex()) {
+			return commodityList;
+		}
+
+		Set<String> promotionCommodityCodeSet = codeParam.getCoupon().getPromotionRange().getCommodityList().stream()
+				.map(PromotionCommodity::getCode).collect(Collectors.toSet());
+		return commodityList.stream().filter(co -> {
+			return promotionCommodityCodeSet.contains(co.getCode());
+		}).collect(Collectors.toList());
+	}
 }

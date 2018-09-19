@@ -49,4 +49,16 @@ public class Commodity implements Cloneable {
 	protected Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+
+		if (obj instanceof Commodity) {
+			Commodity input = (Commodity) obj;
+			return input.getCode() == this.getCode();
+		}
+		return false;
+	}
 }
