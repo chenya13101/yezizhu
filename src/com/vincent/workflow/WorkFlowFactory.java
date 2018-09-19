@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -25,6 +26,8 @@ public class WorkFlowFactory {
 	private static Function<CouponCode, Integer> functionForType = code -> code.getCoupon().getType();
 	private static Function<CouponCode, Integer> functionForRange = code -> code.getCoupon().getPromotionRange()
 			.getType();
+
+	private static final int SIZE_TWO = 2;
 
 	/**
 	 * 
@@ -120,12 +123,53 @@ public class WorkFlowFactory {
 		if (allCodeList == null)
 			return null;
 
-		WorkFlow workFlow = new WorkFlow(commodityList);
-		allCodeList.forEach(code -> {
-			workFlow.addWorkStep(code, commodityList);
-		});
+		if (allCodeList.size() == 1) {
+			WorkFlow workFlow = new WorkFlow(commodityList);
+			workFlow.addWorkStep(allCodeList.get(0), commodityList);
+			return Collections.singletonList(workFlow);
+		}
+		if (allCodeList.size() == SIZE_TWO) { // 简易版本，为两个券码设计
+			return buildFlowFor2RedPacketAll(allCodeList, commodityList);
+		}
+		// TODO 看样子还是需要双层for循环，找出所有可能的组
+		return buildFlowForManyRedPacketAll(allCodeList, commodityList);
+	}
 
-		return Collections.singletonList(workFlow);
+	private static List<WorkFlow> buildFlowForManyRedPacketAll(List<CouponCode> allCodeList,
+			List<Commodity> commodityList) {
+		int size = allCodeList.size();
+		for (int i = 0; i < size; i++) {
+			for (int j = i + 1; j < size; j++) {
+				// TODO 记得及时中断
+			}
+		}
+
+		return null;
+	}
+
+	private static List<WorkFlow> buildFlowFor2RedPacketAll(List<CouponCode> allCodeList,
+			List<Commodity> commodityList) {
+		BigDecimal totalPrice = commodityList.stream().map(Commodity::getPrice).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		List<WorkFlow> resultFlowList = new ArrayList<>();
+		BigDecimal tmpMaxSale = BigDecimal.ZERO;
+		WorkFlow workFlow = new WorkFlow(commodityList);
+		int size = allCodeList.size();
+		for (CouponCode code : allCodeList) {
+			workFlow.addWorkStep(code, commodityList);
+			tmpMaxSale = tmpMaxSale.add(code.getCoupon().getUseLimit().getMaxSale());
+			if (tmpMaxSale.compareTo(totalPrice) >= 0) {
+				resultFlowList.add(workFlow);
+				workFlow = new WorkFlow(commodityList);
+				tmpMaxSale = BigDecimal.ZERO;
+			}
+			// 加上最后一个 flow
+			if (code == allCodeList.get(size - 1) && tmpMaxSale.compareTo(BigDecimal.ZERO) > 0) {
+				resultFlowList.add(workFlow);
+			}
+		}
+
+		return resultFlowList;
 	}
 
 	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
@@ -160,6 +204,7 @@ public class WorkFlowFactory {
 				if (Collections.disjoint(outCommodities, innerCommodities)) {
 					workFlow.addWorkStep(inner, outCommodities);
 				}
+				// FIXME 记得及时中断,可能遇到 maxSale之和已经大于 price之和的情况
 			}
 			workFlowList.add(workFlow);
 		}
