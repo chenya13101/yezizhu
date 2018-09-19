@@ -81,8 +81,6 @@ public class WorkFlowFactory {
 		// workFlow.addCouponCode(tmpCode);
 		// }
 		// });
-		// List<WorkFlow> flowList = buildCommodityFlows(commodityList, couponCodeList);
-		// return flowList;
 
 	}
 
@@ -91,18 +89,43 @@ public class WorkFlowFactory {
 	 */
 	private static List<WorkFlow> buildFlowForSingleCode(CouponCode codeParam, List<Commodity> commodityList) {
 		WorkFlow flow = new WorkFlow(commodityList);
-		flow.addCouponCode(codeParam, filterCommodityForCode(codeParam, commodityList));
+		flow.addWorkStep(codeParam, filterCommodityForCode(codeParam, commodityList));
 		return Collections.singletonList(flow);
 	}
 
 	private static List<WorkFlow> buildRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
 			List<Commodity> commodityList) {
 		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
-		List<CouponCode> AllCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
+		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
 
-		// TODO 111
-		List<WorkFlow> flows = buildCommodityFlows(commodityList, commodityCodeList);
-		return flows;
+		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList);
+		WorkFlow allFlow = buildFlowForRedPacketAll(allCodeList, commodityList);
+		if (commodityCodeList == null || commodityCodeList.size() == 0)
+			return Collections.singletonList(allFlow);
+		// 因为红包规则：全场与全场叠加不限制，而且全场与商品池券叠加也不限制，那么可以直接操作上一步骤生成的list
+		if (allCodeList == null || allCodeList.size() == 0) {
+			return commodityFlows;
+		}
+		commodityFlows.forEach(tmpCommodityFlow -> {
+			allFlow.getWorkSteps().forEach(step -> {
+				tmpCommodityFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+				// TODO 需要保证加入不同flow内的step不再互相影响
+			});
+		});
+
+		return commodityFlows;
+	}
+
+	private static WorkFlow buildFlowForRedPacketAll(List<CouponCode> allCodeList, List<Commodity> commodityList) {
+		if (allCodeList == null)
+			return null;
+
+		WorkFlow workFlow = new WorkFlow(commodityList);
+		allCodeList.forEach(code -> {
+			workFlow.addWorkStep(code, commodityList);
+		});
+
+		return workFlow;
 	}
 
 	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
@@ -120,6 +143,8 @@ public class WorkFlowFactory {
 	// 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算
 	private static List<WorkFlow> buildCommodityFlows(List<Commodity> commodityList,
 			List<CouponCode> promoteCommodityList) {
+		if (promoteCommodityList == null)
+			return null;
 		List<WorkFlow> workFlowList = new ArrayList<>();
 		// 1.使用双层for循环的方式，找出所有的可能workFlow代表的券码组合
 		int size = promoteCommodityList.size();
@@ -133,7 +158,7 @@ public class WorkFlowFactory {
 				List<Commodity> innerCommodities = filterCommodityForCode(inner, commodityList);
 				// 判断:优惠券商品范围没有交叉才能叠加使用
 				if (Collections.disjoint(outCommodities, innerCommodities)) {
-					workFlow.addCouponCode(inner, outCommodities);
+					workFlow.addWorkStep(inner, outCommodities);
 				}
 			}
 			workFlowList.add(workFlow);

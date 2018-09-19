@@ -31,21 +31,14 @@ public class WorkFlow {
 	}
 
 	/**
-	 * 尝试往flow中添加券码
-	 * 
-	 * @param codeParam
-	 *            券码
-	 * @param coommodities
-	 * @return false：没有添加成功
+	 * 尝试往flow中添加step
 	 */
-	public void addCouponCode(CouponCode codeParam, List<Commodity> coommodityParam) {
-		// FIXME 需要修改逻辑
-		// if (isConflict(codeParam)) {
-		// return false;
-		// } TODO 将是否冲突的方法对外暴露,需要防范危险.
-
+	public void addWorkStep(CouponCode codeParam, List<Commodity> coommodityParam) {
 		couponCodeList.add(codeParam);
-		workSteps.add(new WorkStep(codeParam, coommodityParam));
+		// 特别需要注意处理 commodityParam,与本flown内commodityList关联，切断与外界传入值得关联
+		List<String> commCodeList = coommodityParam.stream().map(Commodity::getCode).collect(toList());
+		workSteps.add(new WorkStep(codeParam,
+				commodityList.stream().filter(comm -> commCodeList.contains(comm.getCode())).collect(toList())));
 	}
 
 	public void start() {
@@ -57,6 +50,10 @@ public class WorkFlow {
 		BigDecimal total = commodityList.stream().map(Commodity::getPromotePrice).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		return new CouponGroup(couponCodeList, total);
+	}
+
+	public List<WorkStep> getWorkSteps() {
+		return workSteps;
 	}
 
 }
