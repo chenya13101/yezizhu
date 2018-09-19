@@ -41,6 +41,7 @@ public class WorkFlow {
 				TypeRangeEnum.RED_COMMODITY, TypeRangeEnum.CASH_ALL, TypeRangeEnum.CASH_COMMODITY));
 	}
 
+	// 每个WorkFlow都是一个优惠券组合,每一个workStep都是用来计算这个步骤的优惠券的优惠
 	private List<WorkStep> workSteps = new ArrayList<>();
 
 	private List<Commodity> commodityList; // TODO 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity>
