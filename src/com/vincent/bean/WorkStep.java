@@ -22,7 +22,7 @@ public class WorkStep {
 	// private Map<String, BigDecimal> goodsCodePriceMap = new HashMap<>();
 
 	private CouponCode couponCode;
-	// TODO 整个过程中 couponCode不能做任何的变更
+	// 整个过程中 couponCode不能做任何的变更
 
 	private List<Commodity> commodityList; // 只保存本优惠券范围内的商品,可以修改值，但是不能影响其它flow
 

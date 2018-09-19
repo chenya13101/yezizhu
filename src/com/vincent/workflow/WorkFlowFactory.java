@@ -41,9 +41,7 @@ public class WorkFlowFactory {
 		if (couponCodeList == null || couponCodeList.size() == 0) {
 			return null;
 		}
-		// TODO
-		if (couponCodeList.size() == 1) {
-			// TODO 只有一张券的时候可以简单处理,甚至可以在调用这个方法的地方单独写if
+		if (couponCodeList.size() == 1) {// 只有一张券的时候可以简单处理
 			return buildFlowForSingleCode(couponCodeList.get(0), commodityList);
 		}
 
