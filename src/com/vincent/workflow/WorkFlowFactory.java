@@ -47,8 +47,7 @@ public class WorkFlowFactory {
 		// TODO couponCodeList是否有必要去除重复的优惠券，或者是在某些情况下需要去除重复种类的券码
 		// 如果coupon.code 相同，而不是 红包+全场券，那么只留下一张
 
-		// FXIME 1.把优惠券按照类型区分为三类：红包 折扣 代金券。作为三个list
-		// Map<类型,Map<全场or商品,List<code>>>
+		// Map<类型,Map<全场or商品,List<code>>>分组
 		Map<Integer, Map<Integer, List<CouponCode>>> groupingMap = couponCodeList.stream()
 				.collect(groupingBy(functionForType, groupingBy(functionForRange)));
 
@@ -72,16 +71,6 @@ public class WorkFlowFactory {
 		});
 
 		return resultWorkFlows;
-
-		// TODO 2.上面生成的workFlowList可以作为一个参数传入下面的 for循环。
-		// TODO 3.比较明显的是下面的for不会出现双层，除非红包全场
-		// WorkFlow workFlow = new WorkFlow(commodityList); // TODO 计算出多种多样的券组合
-		// promoteAllList.forEach(tmpCode -> {
-		// if (!workFlow.isConflict(tmpCode)) {
-		// workFlow.addCouponCode(tmpCode);
-		// }
-		// });
-
 	}
 
 	/**
@@ -99,24 +88,35 @@ public class WorkFlowFactory {
 		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
 
 		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList);
-		WorkFlow allFlow = buildFlowForRedPacketAll(allCodeList, commodityList);
+		List<WorkFlow> allFlows = buildFlowForRedPacketAll(allCodeList, commodityList);
 		if (commodityCodeList == null || commodityCodeList.size() == 0)
-			return Collections.singletonList(allFlow);
+			return allFlows;
 		// 因为红包规则：全场与全场叠加不限制，而且全场与商品池券叠加也不限制，那么可以直接操作上一步骤生成的list
 		if (allCodeList == null || allCodeList.size() == 0) {
 			return commodityFlows;
 		}
+
+		List<WorkFlow> resultFlowList = new ArrayList<>();
 		commodityFlows.forEach(tmpCommodityFlow -> {
-			allFlow.getWorkSteps().forEach(step -> {
-				tmpCommodityFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
-				// TODO 需要保证加入不同flow内的step不再互相影响
+			allFlows.forEach(tmpAllFlow -> {
+				WorkFlow tmpFlow = new WorkFlow(commodityList);
+				tmpCommodityFlow.getWorkSteps().forEach(step -> {
+					tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+				});
+				tmpAllFlow.getWorkSteps().forEach(step -> {
+					tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+				});
+				resultFlowList.add(tmpFlow);
 			});
 		});
-
-		return commodityFlows;
+		return resultFlowList;
 	}
 
-	private static WorkFlow buildFlowForRedPacketAll(List<CouponCode> allCodeList, List<Commodity> commodityList) {
+	/**
+	 * 将红包类型得全部全场券组装为一个flow,因为他们可以无条件叠加. TODO 除非凭借部分券就是减扣到0
+	 */
+	private static List<WorkFlow> buildFlowForRedPacketAll(List<CouponCode> allCodeList,
+			List<Commodity> commodityList) {
 		if (allCodeList == null)
 			return null;
 
@@ -125,7 +125,7 @@ public class WorkFlowFactory {
 			workFlow.addWorkStep(code, commodityList);
 		});
 
-		return workFlow;
+		return Collections.singletonList(workFlow);
 	}
 
 	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
