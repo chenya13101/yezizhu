@@ -31,7 +31,6 @@ public class WorkFlow {
 	 * 尝试往flow中添加step
 	 */
 	public void addWorkStep(CouponCode codeParam, List<Commodity> coommodityParam) {
-		// couponCodeList.add(codeParam);
 		// 特别需要注意处理 commodityParam,与本flown内commodityList关联，切断与外界传入值得关联
 		List<String> commCodeList = coommodityParam.stream().map(Commodity::getCode).collect(toList());
 		workSteps.add(new WorkStep(codeParam,
@@ -39,11 +38,28 @@ public class WorkFlow {
 	}
 
 	public void start() {
-		for (WorkStep step : workSteps) {
-			step.run();
-			// TODO 判断结果
+		int i = 0;
+		int size = workSteps.size();
+		List<WorkStep> unavailableSteps = new ArrayList<>();
+		for (; i < size; i++) {
+			WorkStep step = workSteps.get(i);
+			if (!step.run()) { // true: 代表有改变; false: 代表并未改变范围内商品的优惠价格
+				unavailableSteps.add(step);
+				continue;
+			}
+
+			BigDecimal totalPrice = commodityList.stream().map(Commodity::getPromotePrice).reduce(BigDecimal.ZERO,
+					BigDecimal::add);
+			if (totalPrice.compareTo(BigDecimal.ZERO) <= 0) {
+				break;
+			}
+		}
+		if (i < size) {
+			workSteps = workSteps.subList(0, i);
 			System.out.println("当总金额降低到0时，可以结束,把后续步骤删除掉");
 		}
+		workSteps.removeAll(unavailableSteps);
+
 	}
 
 	public CouponGroup getResult() {
