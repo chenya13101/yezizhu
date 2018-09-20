@@ -49,6 +49,8 @@ public class WorkStep {
 	}
 
 	public void run() {
+		// 是否有必要为折扣券和红包券单独做逻辑，甚至封装成类。或者 函数式接口
+
 		// TODO 计算，记得考虑优惠券的使用条件是否满足
 	}
 

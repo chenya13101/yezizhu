@@ -11,8 +11,10 @@ import static java.util.stream.Collectors.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 import com.vincent.bean.Commodity;
+import com.vincent.bean.Coupon;
 import com.vincent.bean.CouponCode;
 import com.vincent.bean.WorkFlow;
 import com.vincent.bean.enums.CouponTypeEnum;
@@ -37,16 +39,19 @@ public class WorkFlowFactory {
 	 *            用户已拥有的券码列表
 	 * @return 可用的券码组合，需要通过计算得出优惠金额
 	 */
-	public static List<WorkFlow> buildWorkFlow(List<Commodity> commodityList, List<CouponCode> couponCodeList) {
-		if (couponCodeList == null || couponCodeList.size() == 0) {
+	public static List<WorkFlow> buildWorkFlow(List<Commodity> commodityList, List<CouponCode> codeParamList) {
+		if (codeParamList == null || codeParamList.size() == 0) {
 			return null;
 		}
-		if (couponCodeList.size() == 1) {// 只有一张券的时候可以简单处理
-			return Collections.singletonList(buildFlowForSingleCode(couponCodeList.get(0), commodityList));
+		if (codeParamList.size() == 1) {// 只有一张券的时候可以简单处理
+			return Collections.singletonList(buildFlowForSingleCode(codeParamList.get(0), commodityList));
 		}
 
 		// TODO couponCodeList是否有必要去除重复的优惠券，或者是在某些情况下需要去除重复种类的券码
 		// 如果coupon.code 相同，而不是 红包+全场券，那么只留下一张
+
+		// TODO
+		List<CouponCode> couponCodeList = distinct(codeParamList);
 
 		// Map<类型,Map<全场or商品,List<code>>>分组
 		Map<Integer, Map<Integer, List<CouponCode>>> groupingMap = couponCodeList.stream()
@@ -72,6 +77,31 @@ public class WorkFlowFactory {
 		});
 
 		return resultWorkFlows;
+	}
+
+	/**
+	 * 去除非[红包+全场券]券码中的重复对象，因为无法叠加
+	 */
+	private static List<CouponCode> distinct(List<CouponCode> couponCodeParamList) {
+		Map<String, List<CouponCode>> map = couponCodeParamList.stream()
+				.collect(groupingBy(tmpCode -> tmpCode.getCoupon().getCode()));
+		List<CouponCode> couponCodeList = new ArrayList<>();
+		map.forEach((key, tmpCodeList) -> {
+			if (tmpCodeList.size() == 1) {
+				couponCodeList.add(tmpCodeList.get(0));
+			} else {
+				Coupon tmpCoupon = tmpCodeList.get(0).getCoupon();
+				boolean isRedPacket = CouponTypeEnum.RED_PACKET.getIndex() == tmpCoupon.getType();
+				boolean isForAll = tmpCoupon.getPromotionRange().getType() == PromotionRangeTypeEnum.ALL.getIndex();
+				if (isRedPacket && isForAll) {// 是不是 红包+全场券
+					couponCodeList.addAll(tmpCodeList);
+				} else {// 其它类型的券码，因为无法叠加使用，所以只取领取时间最早的一张
+					couponCodeList.add(tmpCodeList.stream().sorted(Comparator.comparing(CouponCode::getReceiveTime))
+							.findFirst().get());
+				}
+			}
+		});
+		return couponCodeList;
 	}
 
 	/**
@@ -218,8 +248,7 @@ public class WorkFlowFactory {
 	}
 
 	/**
-	 * 为商品池券组建flow
-	 * 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算
+	 * 为商品池券组建flow 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算
 	 */
 	private static List<WorkFlow> buildCommodityFlows(List<Commodity> commodityList,
 			List<CouponCode> promoteCommodityList) {
