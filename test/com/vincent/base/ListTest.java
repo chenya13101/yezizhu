@@ -27,6 +27,7 @@ public class ListTest {
 	public void testSort() {
 		List<Commodity> list1 = Arrays.asList(new Commodity("14", null), new Commodity("12", null),
 				new Commodity("13", null));
+
 		Commodity comm1 = list1.stream().sorted(Comparator.comparing(Commodity::getCode)).findFirst().get();
 		Assert.assertEquals(comm1.getCode(), "12");
 	}

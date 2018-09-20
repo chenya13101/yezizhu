@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class WorkStep {
 
-	// private String name;
-
 	// private final static BigDecimal TEN = new BigDecimal(10);
 
 	// private final static int NUMS_AFTER_POINT = 4;
