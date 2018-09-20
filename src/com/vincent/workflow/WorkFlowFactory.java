@@ -47,10 +47,7 @@ public class WorkFlowFactory {
 			return Collections.singletonList(buildFlowForSingleCode(codeParamList.get(0), commodityList));
 		}
 
-		// TODO couponCodeList是否有必要去除重复的优惠券，或者是在某些情况下需要去除重复种类的券码
 		// 如果coupon.code 相同，而不是 红包+全场券，那么只留下一张
-
-		// TODO
 		List<CouponCode> couponCodeList = distinct(codeParamList);
 
 		// Map<类型,Map<全场or商品,List<code>>>分组
@@ -174,7 +171,7 @@ public class WorkFlowFactory {
 			return Collections.singletonList(workFlow);
 		}
 		if (allCodeList.size() == SIZE_TWO) { // 简易版本，为两个券码设计
-			return buildFlowFor2RedPacketAll(allCodeList, commodityList);// TODO 似乎有其它处理方式
+			return buildFlowFor2RedPacketAll(allCodeList, commodityList);
 		}
 		// 还是需要双层for循环，找出所有可能的组
 		return buildFlowForManyRedPacketAll(allCodeList, commodityList);
