@@ -19,10 +19,17 @@ public class WorkFlow {
 		// 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity> commodityList
 		this.commodityList = commodityList.stream().map(t -> {
 			try {
-				return (Commodity) t.clone();
+				Commodity newComm = (Commodity) t.clone();
+				if (newComm.getPromotePrice() == null) {
+					newComm.setPromotePrice(t.getPrice());
+				}
+
+				return newComm;
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
-				return new Commodity(t.getCode(), t.getPrice());
+				Commodity newComm = new Commodity(t.getCode(), t.getPrice());
+				newComm.setPromotePrice(t.getPrice());
+				return newComm;
 			}
 		}).collect(Collectors.toList());
 	}
