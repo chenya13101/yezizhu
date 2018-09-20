@@ -59,10 +59,10 @@ public class WorkFlowFactory {
 			CouponTypeEnum typeEnum = EnumUtil.getEnumObject(CouponTypeEnum.class, type -> type.getIndex() == key);
 			switch (typeEnum) {
 			case CASH:
-				resultWorkFlows.addAll(buildCashWorkFlows(rangeCodeMap, commodityList));
+				resultWorkFlows.addAll(buildNonRedPacketWorkFlows(rangeCodeMap, commodityList));
 				break;
 			case DISCOUNT:
-				resultWorkFlows.addAll(buildDiscountWorkFlows(rangeCodeMap, commodityList));
+				resultWorkFlows.addAll(buildNonRedPacketWorkFlows(rangeCodeMap, commodityList));
 				break;
 			case RED_PACKET:
 				resultWorkFlows.addAll(buildRedPacketWorkFlows(rangeCodeMap, commodityList));
@@ -233,19 +233,24 @@ public class WorkFlowFactory {
 		return resultFlowList;
 	}
 
-	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
+	/**
+	 * 组装非红包券码为workFlowList
+	 */
+	private static List<WorkFlow> buildNonRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
 			List<Commodity> commodityList) {
 		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
 		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
+		if (commodityCodeList == null && allCodeList != null) {
+			return allCodeList.stream().map(tmpCode -> buildFlowForSingleCode(tmpCode, commodityList))
+					.collect(toList());
+		}
+		if (commodityCodeList != null && allCodeList == null) {
+			return buildCommodityFlows(commodityList, commodityCodeList);
+		}
 
 		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList);
 		List<WorkFlow> allFlows = allCodeList.stream().map(tmpCode -> buildFlowForSingleCode(tmpCode, commodityList))
 				.collect(toList());
-		if (commodityCodeList == null || commodityCodeList.size() == 0)
-			return allFlows;
-		if (allCodeList == null || allCodeList.size() == 0) {
-			return commodityFlows;
-		}
 
 		// 尝试组装商品池券workFlow与全场券workFlow,组合规则与红包不同
 		List<WorkFlow> resultFlowList = new ArrayList<>();
@@ -262,12 +267,6 @@ public class WorkFlowFactory {
 			});
 		});
 		return resultFlowList;
-	}
-
-	private static List<WorkFlow> buildCashWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
-			List<Commodity> commodityList) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
