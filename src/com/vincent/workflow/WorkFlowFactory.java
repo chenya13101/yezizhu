@@ -133,8 +133,8 @@ public class WorkFlowFactory {
 		List<WorkFlow> resultFlowList = new ArrayList<>();
 		commodityFlows.forEach(tmpCommodityFlow -> {
 			allFlows.forEach(tmpAllFlow -> {
-				BigDecimal tmpAllFlowTotalMaxSale = tmpAllFlow.getCouponCodeList().stream()
-						.map(tmpCodeAll -> tmpCodeAll.getCoupon().getUseLimit().getMaxSale())
+				BigDecimal tmpAllFlowTotalMaxSale = tmpAllFlow.getWorkSteps().stream()
+						.map(tmpStep -> tmpStep.getCouponCode().getCoupon().getUseLimit().getMaxSale())
 						.reduce(BigDecimal.ZERO, BigDecimal::add);
 				// 判断全场红包flow是否已经可以将金额减扣到0
 				if (tmpAllFlowTotalMaxSale.compareTo(totalPrice) < 0) {// 如果不能则需要与商品池红包组合
