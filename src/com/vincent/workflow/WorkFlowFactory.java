@@ -42,7 +42,7 @@ public class WorkFlowFactory {
 			return null;
 		}
 		if (couponCodeList.size() == 1) {// 只有一张券的时候可以简单处理
-			return buildFlowForSingleCode(couponCodeList.get(0), commodityList);
+			return Collections.singletonList(buildFlowForSingleCode(couponCodeList.get(0), commodityList));
 		}
 
 		// TODO couponCodeList是否有必要去除重复的优惠券，或者是在某些情况下需要去除重复种类的券码
@@ -77,10 +77,10 @@ public class WorkFlowFactory {
 	/**
 	 * 如果只有一张优惠券，可以简单处理
 	 */
-	private static List<WorkFlow> buildFlowForSingleCode(CouponCode codeParam, List<Commodity> commodityList) {
+	private static WorkFlow buildFlowForSingleCode(CouponCode codeParam, List<Commodity> commodityList) {
 		WorkFlow flow = new WorkFlow(commodityList);
 		flow.addWorkStep(codeParam, filterCommodityForCode(codeParam, commodityList));
-		return Collections.singletonList(flow);
+		return flow;
 	}
 
 	private static List<WorkFlow> buildRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
@@ -114,7 +114,7 @@ public class WorkFlowFactory {
 	}
 
 	/**
-	 * 将红包类型得全部全场券组装为一个flow,因为他们可以无条件叠加. TODO 除非凭借部分券就是减扣到0
+	 * 将红包类型得全部全场券组装为一个flow,因为他们可以无条件叠加. 除非凭借部分券就是减扣到0
 	 */
 	private static List<WorkFlow> buildFlowForRedPacketAll(List<CouponCode> allCodeList,
 			List<Commodity> commodityList) {
@@ -129,7 +129,7 @@ public class WorkFlowFactory {
 		if (allCodeList.size() == SIZE_TWO) { // 简易版本，为两个券码设计
 			return buildFlowFor2RedPacketAll(allCodeList, commodityList);
 		}
-		// TODO 看样子还是需要双层for循环，找出所有可能的组
+		// 还是需要双层for循环，找出所有可能的组
 		return buildFlowForManyRedPacketAll(allCodeList, commodityList);
 	}
 
@@ -166,21 +166,23 @@ public class WorkFlowFactory {
 		BigDecimal totalPrice = commodityList.stream().map(Commodity::getPrice).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		List<WorkFlow> resultFlowList = new ArrayList<>();
-		BigDecimal tmpMaxSale = BigDecimal.ZERO;
-		WorkFlow workFlow = new WorkFlow(commodityList);
-		int size = allCodeList.size();
-		for (CouponCode code : allCodeList) {
-			workFlow.addWorkStep(code, commodityList);
-			tmpMaxSale = tmpMaxSale.add(code.getCoupon().getUseLimit().getMaxSale());
-			if (tmpMaxSale.compareTo(totalPrice) >= 0) {
-				resultFlowList.add(workFlow);
-				workFlow = new WorkFlow(commodityList);
-				tmpMaxSale = BigDecimal.ZERO;
-			}
-			// 加上最后一个 flow
-			if (code == allCodeList.get(size - 1) && tmpMaxSale.compareTo(BigDecimal.ZERO) > 0) {
-				resultFlowList.add(workFlow);
-			}
+		CouponCode code1 = allCodeList.get(0);
+		CouponCode code2 = allCodeList.get(1);
+		boolean code1Over = code1.getCoupon().getUseLimit().getMaxSale().compareTo(totalPrice) >= 0;
+		boolean code2Over = code2.getCoupon().getUseLimit().getMaxSale().compareTo(totalPrice) >= 0;
+		if (code1Over && code2Over) {
+			resultFlowList.add(buildFlowForSingleCode(code1, commodityList));
+			resultFlowList.add(buildFlowForSingleCode(code2, commodityList));
+		} else if (code1Over) {
+			// 单独可以抵扣全部金额
+			resultFlowList.add(buildFlowForSingleCode(code1, commodityList));
+		} else if (code2Over) {
+			resultFlowList.add(buildFlowForSingleCode(code2, commodityList));
+		} else {
+			WorkFlow flow = new WorkFlow(commodityList);
+			flow.addWorkStep(code1, commodityList);
+			flow.addWorkStep(code2, commodityList);
+			resultFlowList.add(flow);
 		}
 
 		return resultFlowList;
