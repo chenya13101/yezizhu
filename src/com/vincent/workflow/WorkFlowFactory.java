@@ -127,6 +127,7 @@ public class WorkFlowFactory {
 			return commodityFlows;
 		}
 
+		// 尝试组装商品池券workFlow与全场券workflow
 		BigDecimal totalPrice = commodityList.stream().map(Commodity::getPrice).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		List<WorkFlow> resultFlowList = new ArrayList<>();
@@ -234,8 +235,33 @@ public class WorkFlowFactory {
 
 	private static List<WorkFlow> buildDiscountWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
 			List<Commodity> commodityList) {
-		// TODO Auto-generated method stub
-		return null;
+		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
+		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
+
+		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList);
+		List<WorkFlow> allFlows = allCodeList.stream().map(tmpCode -> buildFlowForSingleCode(tmpCode, commodityList))
+				.collect(toList());
+		if (commodityCodeList == null || commodityCodeList.size() == 0)
+			return allFlows;
+		if (allCodeList == null || allCodeList.size() == 0) {
+			return commodityFlows;
+		}
+
+		// 尝试组装商品池券workFlow与全场券workFlow,组合规则与红包不同
+		List<WorkFlow> resultFlowList = new ArrayList<>();
+		commodityFlows.forEach(tmpCommodityFlow -> {
+			allFlows.forEach(tmpAllFlow -> {
+				WorkFlow tmpFlow = new WorkFlow(commodityList);
+				tmpCommodityFlow.getWorkSteps().forEach(step -> {
+					tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+				});
+				tmpAllFlow.getWorkSteps().forEach(step -> {
+					tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+				});
+				resultFlowList.add(tmpFlow);
+			});
+		});
+		return resultFlowList;
 	}
 
 	private static List<WorkFlow> buildCashWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
