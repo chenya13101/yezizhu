@@ -135,14 +135,30 @@ public class WorkFlowFactory {
 
 	private static List<WorkFlow> buildFlowForManyRedPacketAll(List<CouponCode> allCodeList,
 			List<Commodity> commodityList) {
+		BigDecimal totalPrice = commodityList.stream().map(Commodity::getPrice).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
+		List<WorkFlow> resultFlowList = new ArrayList<>();
 		int size = allCodeList.size();
+		BigDecimal tmpMaxSale = BigDecimal.ZERO;
 		for (int i = 0; i < size; i++) {
+			WorkFlow workFlow = new WorkFlow(commodityList);
+			CouponCode out = allCodeList.get(i);
+			workFlow.addWorkStep(out, commodityList);
+			tmpMaxSale = tmpMaxSale.add(out.getCoupon().getUseLimit().getMaxSale());
+
 			for (int j = i + 1; j < size; j++) {
-				// TODO 记得及时中断
+				CouponCode inner = allCodeList.get(i);
+				workFlow.addWorkStep(inner, commodityList);
+				tmpMaxSale = tmpMaxSale.add(inner.getCoupon().getUseLimit().getMaxSale());
+				if (tmpMaxSale.compareTo(totalPrice) >= 0) {
+					break;// 这个workFlow已经组装完毕了。
+					// 本来应该更复杂的，但是实际上用户拥有三个以上全场红包的情况很少，同时红包又能全部抵扣的情况更少.
+				}
 			}
+			resultFlowList.add(workFlow);
 		}
 
-		return null;
+		return resultFlowList;
 	}
 
 	private static List<WorkFlow> buildFlowFor2RedPacketAll(List<CouponCode> allCodeList,
@@ -194,6 +210,7 @@ public class WorkFlowFactory {
 			WorkFlow workFlow = new WorkFlow(commodityList);
 			CouponCode out = promoteCommodityList.get(i);
 			List<Commodity> outCommodities = filterCommodityForCode(out, commodityList);
+			workFlow.addWorkStep(out, outCommodities);
 
 			for (int j = i + 1; j < size; j++) {
 				CouponCode inner = promoteCommodityList.get(j);

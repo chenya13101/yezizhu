@@ -26,16 +26,6 @@ public class WorkStep {
 
 	private List<Commodity> commodityList; // 只保存本优惠券范围内的商品,可以修改值，但是不能影响其它flow
 
-	// private WorkStep nextStep;
-
-	// public WorkStep getNextStep() {
-	// return nextStep;
-	// }
-
-	// public void setNextStep(WorkStep nextStep) {
-	// this.nextStep = nextStep;
-	// }
-
 	public List<Commodity> getCommodityList() {
 		return commodityList;
 	}
@@ -57,23 +47,6 @@ public class WorkStep {
 	public CouponCode getCouponCode() {
 		return couponCode;
 	}
-
-	// public void setCouponCode(CouponCode couponCode) { this.couponCode =
-	// couponCode; }
-
-	// private boolean hasNext() {
-	// return nextStep != null;
-	//
-	// }
-	//
-	// public WorkStep getLast() {
-	// WorkStep current = this;
-	// while (current.hasNext()) {
-	// current = this.getNextStep();
-	// }
-	// return current;
-	//
-	// }
 
 	public void run() {
 		// TODO 计算
