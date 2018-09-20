@@ -49,7 +49,7 @@ public class WorkStep {
 	}
 
 	public void run() {
-		// TODO 计算
+		// TODO 计算，记得考虑优惠券的使用条件是否满足
 	}
 
 }

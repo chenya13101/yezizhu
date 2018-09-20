@@ -217,7 +217,10 @@ public class WorkFlowFactory {
 		return null;
 	}
 
-	// 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算
+	/**
+	 * 为商品池券组建flow
+	 * 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算
+	 */
 	private static List<WorkFlow> buildCommodityFlows(List<Commodity> commodityList,
 			List<CouponCode> promoteCommodityList) {
 		if (promoteCommodityList == null)
@@ -238,7 +241,6 @@ public class WorkFlowFactory {
 				if (Collections.disjoint(outCommodities, innerCommodities)) {
 					workFlow.addWorkStep(inner, outCommodities);
 				}
-				// FIXME 记得及时中断,可能遇到 maxSale之和已经大于 price之和的情况
 			}
 			workFlowList.add(workFlow);
 		}

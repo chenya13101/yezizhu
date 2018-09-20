@@ -41,7 +41,13 @@ public class WorkFlow {
 	}
 
 	public void start() {
-		workSteps.forEach(WorkStep::run);// TODO 需要确保是按照顺序来运行的
+		workSteps.forEach(step -> {
+			step.run();
+			// TODO 判断结果
+			System.out.println("当总金额降低到0时，可以结束,把后续步骤删除掉");
+		});
+
+		// TODO 需要确保是按照顺序来运行的
 	}
 
 	public CouponGroup getResult() {
