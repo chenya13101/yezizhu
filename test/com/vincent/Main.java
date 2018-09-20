@@ -16,8 +16,10 @@ public class Main {
 		List<Commodity> commodityList = null;
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
-		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream()
-				.map(flow -> CompletableFuture.supplyAsync(() -> flow.getResult())).collect(toList());
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.stream().map(CouponGroup::getTotal).forEach(System.out::println);
 	}

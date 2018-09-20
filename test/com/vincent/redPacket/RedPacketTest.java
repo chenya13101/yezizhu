@@ -35,16 +35,23 @@ public class RedPacketTest {
 		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
-		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream()
-				.map(flow -> CompletableFuture.supplyAsync(() -> flow.getResult())).collect(toList());
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
-		System.out.println(groups.size());
-		groups.stream().map(CouponGroup::getTotal).forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal(), 1005);
+
+		// System.out.println(groups.size());
+		// groups.stream().map(CouponGroup::getTotal).forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(1005)), 0);
 
 	}
 
-	public void oneCommodity() {
+	public void oneCommodityOver() {
+
+	}
+
+	public void oneCommodityLess() {
 
 	}
 
