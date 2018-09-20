@@ -3,7 +3,6 @@ package com.vincent.workflow;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
@@ -24,11 +23,6 @@ import com.vincent.common.Constant;
 import com.vincent.util.EnumUtil;
 
 public class WorkFlowFactory {
-
-	private static Function<CouponCode, Integer> functionForType = code -> code.getCoupon().getType();
-	private static Function<CouponCode, Integer> functionForRange = code -> code.getCoupon().getPromotionRange()
-			.getType();
-
 	private static final int SIZE_TWO = 2;
 
 	/**
@@ -52,7 +46,8 @@ public class WorkFlowFactory {
 
 		// Map<类型,Map<全场or商品,List<code>>>分组
 		Map<Integer, Map<Integer, List<CouponCode>>> groupingMap = couponCodeList.stream()
-				.collect(groupingBy(functionForType, groupingBy(functionForRange)));
+				.collect(groupingBy(code -> code.getCoupon().getType(),
+						groupingBy(code -> code.getCoupon().getPromotionRange().getType())));
 
 		List<WorkFlow> resultWorkFlows = new ArrayList<>();
 		groupingMap.forEach((key, rangeCodeMap) -> {
