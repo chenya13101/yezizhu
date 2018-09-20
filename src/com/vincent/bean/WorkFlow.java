@@ -15,7 +15,6 @@ public class WorkFlow {
 
 	private List<Commodity> commodityList; // TODO 本flow内所有的step共享commodityList，操作价格会影响下一步计算 List<Commodity>
 											// commodityList
-
 	private List<CouponCode> couponCodeList = new ArrayList<>();
 
 	public WorkFlow(List<Commodity> commodityList) {
@@ -50,6 +49,10 @@ public class WorkFlow {
 		BigDecimal total = commodityList.stream().map(Commodity::getPromotePrice).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
 		return new CouponGroup(couponCodeList, total);
+	}
+
+	public List<CouponCode> getCouponCodeList() {
+		return couponCodeList;
 	}
 
 	public List<WorkStep> getWorkSteps() {

@@ -83,6 +83,9 @@ public class WorkFlowFactory {
 		return flow;
 	}
 
+	/**
+	 * 为[红包]计算出可用的workFlow,其它类型的优惠券走其它相应逻辑
+	 */
 	private static List<WorkFlow> buildRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
 			List<Commodity> commodityList) {
 		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
@@ -97,17 +100,31 @@ public class WorkFlowFactory {
 			return commodityFlows;
 		}
 
+		BigDecimal totalPrice = commodityList.stream().map(Commodity::getPrice).reduce(BigDecimal.ZERO,
+				BigDecimal::add);
 		List<WorkFlow> resultFlowList = new ArrayList<>();
 		commodityFlows.forEach(tmpCommodityFlow -> {
 			allFlows.forEach(tmpAllFlow -> {
-				WorkFlow tmpFlow = new WorkFlow(commodityList);
-				tmpCommodityFlow.getWorkSteps().forEach(step -> {
-					tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
-				});
-				tmpAllFlow.getWorkSteps().forEach(step -> {
-					tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
-				});
-				resultFlowList.add(tmpFlow);
+				BigDecimal tmpAllFlowTotalMaxSale = tmpAllFlow.getCouponCodeList().stream()
+						.map(tmpCodeAll -> tmpCodeAll.getCoupon().getUseLimit().getMaxSale())
+						.reduce(BigDecimal.ZERO, BigDecimal::add);
+				// 判断全场红包flow是否已经可以将金额减扣到0
+				if (tmpAllFlowTotalMaxSale.compareTo(totalPrice) < 0) {// 如果不能则需要与商品池红包组合
+					WorkFlow tmpFlow = new WorkFlow(commodityList);
+					tmpCommodityFlow.getWorkSteps().forEach(step -> {
+						tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+					});
+					tmpAllFlow.getWorkSteps().forEach(step -> {
+						tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+					});
+					resultFlowList.add(tmpFlow);
+				} else {
+					WorkFlow tmpFlow = new WorkFlow(commodityList);
+					tmpAllFlow.getWorkSteps().forEach(step -> {
+						tmpFlow.addWorkStep(step.getCouponCode(), step.getCommodityList());
+					});
+					resultFlowList.add(tmpFlow);
+				}
 			});
 		});
 		return resultFlowList;
@@ -127,7 +144,7 @@ public class WorkFlowFactory {
 			return Collections.singletonList(workFlow);
 		}
 		if (allCodeList.size() == SIZE_TWO) { // 简易版本，为两个券码设计
-			return buildFlowFor2RedPacketAll(allCodeList, commodityList);
+			return buildFlowFor2RedPacketAll(allCodeList, commodityList);// TODO 似乎有其它处理方式
 		}
 		// 还是需要双层for循环，找出所有可能的组
 		return buildFlowForManyRedPacketAll(allCodeList, commodityList);
