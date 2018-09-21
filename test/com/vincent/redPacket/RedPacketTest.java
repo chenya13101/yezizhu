@@ -147,12 +147,12 @@ public class RedPacketTest {
 
 	@Test
 	public void twoRedAllOver() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(155);
+		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(15);
 		CouponCode couponCode1 = new CouponCode();
 		couponCode1.setCode("HBQC001");
 		couponCode1.setCoupon(coupon);
 
-		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(15);
+		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(150);
 		CouponCode couponCode2 = new CouponCode();
 		couponCode2.setCode("HBQC002");
 		couponCode2.setCoupon(coupon2);
@@ -169,7 +169,11 @@ public class RedPacketTest {
 			flow.start();
 			return CompletableFuture.supplyAsync(() -> flow.getResult());
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+		List<CouponGroup> groupList = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+		List<CouponGroup> groups = groupList.stream()
+				.sorted((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()))
+				.collect(toList());
+
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(0)), 0);
 	}
@@ -203,9 +207,10 @@ public class RedPacketTest {
 			flow.start();
 			return CompletableFuture.supplyAsync(() -> flow.getResult());
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
-
-		groups.stream().sorted((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
+		List<CouponGroup> groupList = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+		List<CouponGroup> groups = groupList.stream()
+				.sorted((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()))
+				.collect(toList());
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(110)), 0);
 	}
