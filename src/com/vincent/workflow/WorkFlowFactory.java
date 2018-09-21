@@ -210,13 +210,9 @@ public class WorkFlowFactory {
 		CouponCode code2 = allCodeList.get(1);
 		boolean code1Over = code1.getCoupon().getUseLimit().getMaxSale().compareTo(totalPrice) >= 0;
 		boolean code2Over = code2.getCoupon().getUseLimit().getMaxSale().compareTo(totalPrice) >= 0;
-		if (code1Over && code2Over) {
-			resultFlowList.add(buildFlowForSingleCode(code1, commodityList));
-			resultFlowList.add(buildFlowForSingleCode(code2, commodityList));
-		} else if (code1Over) {
+		if (code1Over || code2Over) {
 			// 单独可以抵扣全部金额
 			resultFlowList.add(buildFlowForSingleCode(code1, commodityList));
-		} else if (code2Over) {
 			resultFlowList.add(buildFlowForSingleCode(code2, commodityList));
 		} else {
 			WorkFlow flow = new WorkFlow(commodityList);

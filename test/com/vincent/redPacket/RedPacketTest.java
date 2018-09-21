@@ -146,6 +146,35 @@ public class RedPacketTest {
 	}
 
 	@Test
+	public void twoRedAllOver() {
+		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(155);
+		CouponCode couponCode1 = new CouponCode();
+		couponCode1.setCode("HBQC001");
+		couponCode1.setCoupon(coupon);
+
+		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(15);
+		CouponCode couponCode2 = new CouponCode();
+		couponCode2.setCode("HBQC002");
+		couponCode2.setCoupon(coupon2);
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(80));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(50));
+		Commodity comm3 = new Commodity("XiGua", new BigDecimal(20));
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2, comm3);
+		List<CouponCode> couponCodeList = Arrays.asList(couponCode1, couponCode2);
+		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
+
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+		groups.forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(0)), 0);
+	}
+
+	@Test
 	public void manyRedAll() {
 		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(10);
 		CouponCode couponCode1 = new CouponCode();
