@@ -169,6 +169,9 @@ public class WorkFlowFactory {
 		if (allCodeList.size() == SIZE_TWO) { // 简易版本，为两个券码设计
 			return buildFlowFor2RedPacketAll(allCodeList, commodityList);
 		}
+
+		allCodeList.sort((code1, code2) -> code1.getCoupon().getUseLimit().getMaxSale()
+				.compareTo(code2.getCoupon().getUseLimit().getMaxSale()));
 		// 还是需要双层for循环，找出所有可能的组
 		return buildFlowForManyRedPacketAll(allCodeList, commodityList);
 	}
@@ -185,6 +188,10 @@ public class WorkFlowFactory {
 			CouponCode out = allCodeList.get(i);
 			workFlow.addWorkStep(out, commodityList);
 			tmpMaxSale = tmpMaxSale.add(out.getCoupon().getUseLimit().getMaxSale());
+			if (tmpMaxSale.compareTo(totalPrice) >= 0) {
+				resultFlowList.add(workFlow);
+				continue;
+			}
 
 			for (int j = i + 1; j < size; j++) {
 				CouponCode inner = allCodeList.get(j);

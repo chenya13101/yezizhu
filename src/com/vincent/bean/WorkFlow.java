@@ -62,7 +62,7 @@ public class WorkFlow {
 			}
 		}
 		if (i < size - 1) {
-			workSteps = workSteps.subList(0, i);
+			workSteps = workSteps.subList(0, i > 0 ? i : 1);
 			System.out.println("当总金额降低到0时，可以结束,把后续步骤删除掉");
 		}
 		workSteps.removeAll(unavailableSteps);
