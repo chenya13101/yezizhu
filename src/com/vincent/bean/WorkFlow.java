@@ -73,7 +73,8 @@ public class WorkFlow {
 		List<CouponCode> couponCodeList = workSteps.stream().map(WorkStep::getCouponCode).collect(toList());
 		BigDecimal total = commodityList.stream().map(Commodity::getPromotePrice).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
-		return new CouponGroup(couponCodeList, total);
+
+		return new CouponGroup(this.commodityList, couponCodeList, total);
 	}
 
 	public List<WorkStep> getWorkSteps() {

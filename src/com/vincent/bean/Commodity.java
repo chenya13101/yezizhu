@@ -51,6 +51,12 @@ public class Commodity implements Cloneable {
 	}
 
 	@Override
+	public String toString() {
+		return String.format("%-8s", this.getCode()) + " - " + String.format("%-5s", this.getPrice()) + " - "
+				+ String.format("%-5s", this.getPromotePrice());
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;

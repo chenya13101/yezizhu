@@ -13,6 +13,16 @@ public class PromotionCommodity {
 
 	private String code;
 
+	public PromotionCommodity() {
+		super();
+	}
+
+	public PromotionCommodity(String name, String code) {
+		super();
+		this.name = name;
+		this.code = code;
+	}
+
 	public String getName() {
 		return name;
 	}
