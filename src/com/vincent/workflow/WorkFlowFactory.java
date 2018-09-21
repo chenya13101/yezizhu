@@ -187,7 +187,7 @@ public class WorkFlowFactory {
 			tmpMaxSale = tmpMaxSale.add(out.getCoupon().getUseLimit().getMaxSale());
 
 			for (int j = i + 1; j < size; j++) {
-				CouponCode inner = allCodeList.get(i);
+				CouponCode inner = allCodeList.get(j);
 				workFlow.addWorkStep(inner, commodityList);
 				tmpMaxSale = tmpMaxSale.add(inner.getCoupon().getUseLimit().getMaxSale());
 				if (tmpMaxSale.compareTo(totalPrice) >= 0) {
