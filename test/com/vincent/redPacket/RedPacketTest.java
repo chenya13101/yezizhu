@@ -45,8 +45,31 @@ public class RedPacketTest {
 	}
 
 	@Test
+	public void oneRedAllOver() {
+		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(150);
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("HBQC001");
+		couponCode.setCoupon(coupon);
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(100));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(15));
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
+		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
+		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
+
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+		groups.forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(0)), 0);
+	}
+
+	@Test
 	public void oneRedCommodity() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon();
+		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon(8);
 		CouponCode couponCode = new CouponCode();
 		couponCode.setCode("HBSP002");
 		couponCode.setCoupon(coupon);
@@ -66,6 +89,31 @@ public class RedPacketTest {
 
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(107)), 0);
+	}
+
+	@Test
+	public void oneRedCommodityOver() {
+		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon(125);
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("HBSP002");
+		couponCode.setCoupon(coupon);
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(100));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
+		Commodity comm3 = new Commodity("BeiZi", new BigDecimal(40));
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2, comm3);
+		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
+		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
+
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+
+		groups.forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(60)), 0);
 	}
 
 	@Test
