@@ -512,4 +512,42 @@ public class RedPacketTest {
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(100)), 0);
 	}
+
+	@Test
+	public void oneRedAllAndCommodity() {
+		PromotionCommodity pcomm1 = new PromotionCommodity("韶音耳机", "ShaoYin");
+		PromotionCommodity pcomm2 = new PromotionCommodity("西瓜", "XiGua");
+		PromotionCommodity pcomm3 = new PromotionCommodity("电脑", "DianNao");
+
+		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon(20, "CPSPHB001",
+				Arrays.asList(pcomm1, pcomm2, pcomm3));
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("code001");
+		couponCode.setCoupon(coupon);
+		couponCode.setReceiveTime(new Date());
+
+		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(15);
+		CouponCode couponCode2 = new CouponCode();
+		couponCode2.setCode("code002");
+		couponCode2.setCoupon(coupon2);
+		couponCode2.setReceiveTime(new Date());
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(120));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(30));
+		Commodity comm3 = new Commodity("BeiZi", new BigDecimal(20));
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2, comm3);
+		List<CouponCode> couponCodeList = Arrays.asList(couponCode, couponCode2);
+		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
+
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+
+		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
+		groups.forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(135)), 0);
+	}
 }
