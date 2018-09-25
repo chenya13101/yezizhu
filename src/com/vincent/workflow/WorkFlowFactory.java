@@ -113,7 +113,7 @@ public class WorkFlowFactory {
 		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
 		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
 
-		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList);
+		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList, true);
 		List<WorkFlow> allFlows = buildFlowForRedPacketAll(allCodeList, commodityList);
 		if (commodityCodeList == null || commodityCodeList.size() == 0)
 			return allFlows;
@@ -243,10 +243,10 @@ public class WorkFlowFactory {
 					.collect(toList());
 		}
 		if (commodityCodeList != null && allCodeList == null) {
-			return buildCommodityFlows(commodityList, commodityCodeList);
+			return buildCommodityFlows(commodityList, commodityCodeList, false);
 		}
 
-		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList);
+		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList, false);
 		List<WorkFlow> allFlows = allCodeList.stream().map(tmpCode -> buildFlowForSingleCode(tmpCode, commodityList))
 				.collect(toList());
 
@@ -268,10 +268,12 @@ public class WorkFlowFactory {
 	}
 
 	/**
-	 * 为商品池券组建flow 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算
+	 * 为商品池券组建flow 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算.
+	 * 
+	 * FIXME 紅包可以在使用的商品范围完全一致时叠加
 	 */
 	private static List<WorkFlow> buildCommodityFlows(List<Commodity> commodityList,
-			List<CouponCode> promoteCommodityList) {
+			List<CouponCode> promoteCommodityList, boolean isRedPackaet) {
 		if (promoteCommodityList == null)
 			return null;
 		List<WorkFlow> workFlowList = new ArrayList<>();
@@ -286,9 +288,14 @@ public class WorkFlowFactory {
 			for (int j = i + 1; j < size; j++) {
 				CouponCode inner = promoteCommodityList.get(j);
 				List<Commodity> innerCommodities = filterCommodityForCode(inner, commodityList);
-				// 判断:优惠券商品范围没有交叉才能叠加使用
+				// 判断:优惠券商品范围没有交叉才能叠加使用。
 				if (Collections.disjoint(outCommodities, innerCommodities)) {
 					workFlow.addWorkStep(inner, outCommodities);
+				} else if (isRedPackaet) {
+					if (innerCommodities.size() == outCommodities.size()
+							&& outCommodities.containsAll(innerCommodities)) {
+						workFlow.addWorkStep(inner, outCommodities);
+					}
 				}
 			}
 			workFlowList.add(workFlow);

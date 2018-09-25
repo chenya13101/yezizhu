@@ -35,10 +35,9 @@ public class CouponTemplateUtil {
 	 * 
 	 * @return
 	 */
-	public static Coupon getRedPacketCommodityCoupon(double maxSaleParam) {
+	public static Coupon getRedPacketCommodityCoupon(double maxSaleParam, String code) {
 		BigDecimal maxSale = new BigDecimal(maxSaleParam);
-		String code = "CPHB001";
-		String name = maxSaleParam + "元全场商品券";
+		String name = maxSaleParam + "元 韶音 西瓜 电脑商品券";
 
 		UseLimitInward useLimitInward = new UseLimitInward();
 		useLimitInward.setMaxSale(maxSale);
