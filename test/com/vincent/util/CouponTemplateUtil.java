@@ -2,6 +2,8 @@ package com.vincent.util;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.vincent.bean.Coupon;
 import com.vincent.bean.PromotionRange;
@@ -27,6 +29,26 @@ public class CouponTemplateUtil {
 		int couponType = CouponTypeEnum.RED_PACKET.getIndex();
 		int promotionType = PromotionRangeTypeEnum.ALL.getIndex();
 		PromotionRange promotionRange = new PromotionRange(promotionType, null);
+		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
+	}
+
+	/**
+	 * 得到红包全场优惠券的模板
+	 * 
+	 * @return
+	 */
+	public static Coupon getRedPacketCommodityCoupon(double maxSaleParam, String code,
+			List<PromotionCommodity> commodityList) {
+		BigDecimal maxSale = new BigDecimal(maxSaleParam);
+		String name = maxSaleParam + "元"
+				+ commodityList.stream().map(PromotionCommodity::getName).collect(Collectors.joining("-")) + "券";
+
+		UseLimitInward useLimitInward = new UseLimitInward();
+		useLimitInward.setMaxSale(maxSale);
+		int couponType = CouponTypeEnum.RED_PACKET.getIndex();
+		int promotionType = PromotionRangeTypeEnum.COMMODITY.getIndex();
+
+		PromotionRange promotionRange = new PromotionRange(promotionType, commodityList);
 		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
 	}
 
