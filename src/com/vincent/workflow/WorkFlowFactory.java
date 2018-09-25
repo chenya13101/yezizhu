@@ -42,7 +42,9 @@ public class WorkFlowFactory {
 		}
 
 		// 如果coupon.code 相同，而不是 红包+全场券，那么只留下一张
-		List<CouponCode> couponCodeList = distinct(codeParamList);
+		List<CouponCode> couponCodeList = distinct(codeParamList).stream()
+				.filter(tmpCode -> filterCommodityForCode(tmpCode, commodityList).size() > 0).collect(toList());
+		// 过滤去掉不会在订单中商品生效的优惠券
 
 		// Map<类型,Map<全场or商品,List<code>>>分组
 		Map<Integer, Map<Integer, List<CouponCode>>> groupingMap = couponCodeList.stream()
@@ -291,15 +293,15 @@ public class WorkFlowFactory {
 	 * 紅包可以在使用的商品范围完全一致时叠加
 	 */
 	private static List<WorkFlow> buildCommodityFlows(List<Commodity> commodityList,
-			List<CouponCode> promoteCommodityList, CouponTypeEnum typeEnum) {
-		if (promoteCommodityList == null)
+			List<CouponCode> promoteCommodityCodeList, CouponTypeEnum typeEnum) {
+		if (promoteCommodityCodeList == null)
 			return null;
 		List<WorkFlow> workFlowList = new ArrayList<>();
 		// 1.使用双层for循环的方式，找出所有的可能workFlow代表的券码组合
-		int size = promoteCommodityList.size();
+		int size = promoteCommodityCodeList.size();
 		for (int i = 0; i < size; i++) {
 			WorkFlow workFlow = new WorkFlow(commodityList);
-			CouponCode out = promoteCommodityList.get(i);
+			CouponCode out = promoteCommodityCodeList.get(i);
 			List<Commodity> outCommodities = filterCommodityForCode(out, commodityList);
 
 			if (isNonDiscountAndOverCommodityPrice(out, typeEnum, outCommodities)) {
@@ -310,20 +312,19 @@ public class WorkFlowFactory {
 			workFlow.addWorkStep(out, outCommodities);
 
 			for (int j = i + 1; j < size; j++) {
-				CouponCode inner = promoteCommodityList.get(j);
+				CouponCode inner = promoteCommodityCodeList.get(j);
 				List<Commodity> innerCommodities = filterCommodityForCode(inner, commodityList);
-
 				if (isNonDiscountAndOverCommodityPrice(inner, typeEnum, innerCommodities)) {
 					// 是否超过优惠范围内商品的价格之和，忽略
 					continue;
 				}
 				// 判断:优惠券商品范围没有交叉才能叠加使用。
 				if (Collections.disjoint(outCommodities, innerCommodities)) {
-					workFlow.addWorkStep(inner, outCommodities);
+					workFlow.addWorkStep(inner, innerCommodities);
 				} else if (typeEnum == CouponTypeEnum.RED_PACKET) {
 					if (innerCommodities.size() == outCommodities.size()
 							&& outCommodities.containsAll(innerCommodities)) {
-						workFlow.addWorkStep(inner, outCommodities);
+						workFlow.addWorkStep(inner, innerCommodities);
 					}
 				}
 			}
