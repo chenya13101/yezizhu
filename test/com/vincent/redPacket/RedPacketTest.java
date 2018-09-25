@@ -280,7 +280,36 @@ public class RedPacketTest {
 
 	@Test
 	public void twoRedCommodityOver() {
+		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon(8, "SPHB001");
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("HBSP002");
+		couponCode.setCoupon(coupon);
+		couponCode.setReceiveTime(new Date());
 
+		Coupon coupon2 = CouponTemplateUtil.getRedPacketCommodityCoupon(102, "SPHB002");
+		CouponCode couponCode2 = new CouponCode();
+		couponCode2.setCode("HBSP002");
+		couponCode2.setCoupon(coupon2);
+		couponCode2.setReceiveTime(new Date());
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(100));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(15));
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
+		List<CouponCode> couponCodeList = Arrays.asList(couponCode, couponCode2);
+		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
+
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			flow.start();
+			return CompletableFuture.supplyAsync(() -> flow.getResult());
+		}).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
+		// TODO 如果最后的金额一致，同时一个组内包含另一个组全部券码。取size小的，淘汰掉大的
+
+		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
+		groups.forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(15)), 0);
+		// FIXME 居然只出现了一个，并且商品打印出来不对，少了
 	}
 
 }

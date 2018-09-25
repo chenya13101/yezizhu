@@ -54,13 +54,13 @@ public class WorkFlowFactory {
 			CouponTypeEnum typeEnum = EnumUtil.getEnumObject(CouponTypeEnum.class, type -> type.getIndex() == key);
 			switch (typeEnum) {
 			case CASH:
-				resultWorkFlows.addAll(buildNonRedPacketWorkFlows(rangeCodeMap, commodityList));
+				resultWorkFlows.addAll(buildNonRedPacketWorkFlows(rangeCodeMap, commodityList, typeEnum));
 				break;
 			case DISCOUNT:
-				resultWorkFlows.addAll(buildNonRedPacketWorkFlows(rangeCodeMap, commodityList));
+				resultWorkFlows.addAll(buildNonRedPacketWorkFlows(rangeCodeMap, commodityList, typeEnum));
 				break;
 			case RED_PACKET:
-				resultWorkFlows.addAll(buildRedPacketWorkFlows(rangeCodeMap, commodityList));
+				resultWorkFlows.addAll(buildRedPacketWorkFlows(rangeCodeMap, commodityList, typeEnum));
 				break;
 			default:
 				throw new IllegalArgumentException(Constant.INVALID_INDEX);
@@ -107,13 +107,15 @@ public class WorkFlowFactory {
 
 	/**
 	 * 为[红包]计算出可用的workFlow,其它类型的优惠券走其它相应逻辑
+	 * 
+	 * @param typeEnum
 	 */
 	private static List<WorkFlow> buildRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
-			List<Commodity> commodityList) {
+			List<Commodity> commodityList, CouponTypeEnum typeEnum) {
 		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
 		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
 
-		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList, true);
+		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList, typeEnum);
 		List<WorkFlow> allFlows = buildFlowForRedPacketAll(allCodeList, commodityList);
 		if (commodityCodeList == null || commodityCodeList.size() == 0)
 			return allFlows;
@@ -233,9 +235,11 @@ public class WorkFlowFactory {
 
 	/**
 	 * 组装非红包券码为workFlowList
+	 * 
+	 * @param typeEnum
 	 */
 	private static List<WorkFlow> buildNonRedPacketWorkFlows(Map<Integer, List<CouponCode>> rangeCodeMap,
-			List<Commodity> commodityList) {
+			List<Commodity> commodityList, CouponTypeEnum typeEnum) {
 		List<CouponCode> commodityCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.COMMODITY.getIndex());
 		List<CouponCode> allCodeList = rangeCodeMap.get(PromotionRangeTypeEnum.ALL.getIndex());
 		if (commodityCodeList == null && allCodeList != null) {
@@ -243,10 +247,10 @@ public class WorkFlowFactory {
 					.collect(toList());
 		}
 		if (commodityCodeList != null && allCodeList == null) {
-			return buildCommodityFlows(commodityList, commodityCodeList, false);
+			return buildCommodityFlows(commodityList, commodityCodeList, typeEnum);
 		}
 
-		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList, false);
+		List<WorkFlow> commodityFlows = buildCommodityFlows(commodityList, commodityCodeList, typeEnum);
 		List<WorkFlow> allFlows = allCodeList.stream().map(tmpCode -> buildFlowForSingleCode(tmpCode, commodityList))
 				.collect(toList());
 
@@ -268,12 +272,26 @@ public class WorkFlowFactory {
 	}
 
 	/**
+	 * 是否不是折扣券，同时 超过优惠范围内商品的价格之和，如果超过可以直接单独作为一个flow
+	 */
+	private static boolean isNonDiscountAndOverCommodityPrice(CouponCode code, CouponTypeEnum typeEnum,
+			List<Commodity> commodities) {
+		if (typeEnum == CouponTypeEnum.CASH || CouponTypeEnum.RED_PACKET == typeEnum) {
+			// 是否超过优惠范围内商品的价格之和，如果超过可以直接单独作为一个flow
+			BigDecimal totalPrice = commodities.stream().map(Commodity::getPrice).reduce(BigDecimal.ZERO,
+					BigDecimal::add);
+			return code.getCoupon().getUseLimit().getMaxSale().compareTo(totalPrice) >= 0;
+		}
+		return false;
+	}
+
+	/**
 	 * 为商品池券组建flow 规则：先算商品池券，再算全场券。所以分为两个方法. workFlow中先添加的step会先行计算.
 	 * 
-	 * FIXME 紅包可以在使用的商品范围完全一致时叠加
+	 * 紅包可以在使用的商品范围完全一致时叠加
 	 */
 	private static List<WorkFlow> buildCommodityFlows(List<Commodity> commodityList,
-			List<CouponCode> promoteCommodityList, boolean isRedPackaet) {
+			List<CouponCode> promoteCommodityList, CouponTypeEnum typeEnum) {
 		if (promoteCommodityList == null)
 			return null;
 		List<WorkFlow> workFlowList = new ArrayList<>();
@@ -283,15 +301,26 @@ public class WorkFlowFactory {
 			WorkFlow workFlow = new WorkFlow(commodityList);
 			CouponCode out = promoteCommodityList.get(i);
 			List<Commodity> outCommodities = filterCommodityForCode(out, commodityList);
+
+			if (isNonDiscountAndOverCommodityPrice(out, typeEnum, outCommodities)) {
+				// 是否超过优惠范围内商品的价格之和，如果超过可以直接单独作为一个flow
+				workFlowList.add(buildFlowForSingleCode(out, commodityList));
+				continue;
+			}
 			workFlow.addWorkStep(out, outCommodities);
 
 			for (int j = i + 1; j < size; j++) {
 				CouponCode inner = promoteCommodityList.get(j);
 				List<Commodity> innerCommodities = filterCommodityForCode(inner, commodityList);
+
+				if (isNonDiscountAndOverCommodityPrice(inner, typeEnum, innerCommodities)) {
+					// 是否超过优惠范围内商品的价格之和，忽略
+					continue;
+				}
 				// 判断:优惠券商品范围没有交叉才能叠加使用。
 				if (Collections.disjoint(outCommodities, innerCommodities)) {
 					workFlow.addWorkStep(inner, outCommodities);
-				} else if (isRedPackaet) {
+				} else if (typeEnum == CouponTypeEnum.RED_PACKET) {
 					if (innerCommodities.size() == outCommodities.size()
 							&& outCommodities.containsAll(innerCommodities)) {
 						workFlow.addWorkStep(inner, outCommodities);
