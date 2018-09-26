@@ -11,4 +11,9 @@ public class RedPacketLimit extends UseLimit {
 		this.setMaxSale(maxSale);
 	}
 
+	@Override
+	public boolean checkUseCondition(BigDecimal totalPromPrice) {
+		return true;
+	}
+
 }

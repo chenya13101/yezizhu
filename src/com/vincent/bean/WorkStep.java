@@ -60,18 +60,30 @@ public class WorkStep {
 	 */
 	public boolean run() {
 		BigDecimal beforeChangeTotalPromPrice = getTotalPromPrice();
+		if (beforeChangeTotalPromPrice.compareTo(BigDecimal.ZERO) == 0) {
+			return false;
+		}
+
 		Coupon currentCoupon = couponCode.getCoupon();
+		UseLimit limit = currentCoupon.getUseLimit();
 		CouponTypeEnum typeEnum = EnumUtil.getEnumObject(CouponTypeEnum.class,
 				type -> type.getIndex() == currentCoupon.getType());
 		switch (typeEnum) {
 		case CASH:
-			// TODO 计算，记得考虑优惠券的使用条件是否满足
+			// 判断优惠券的使用条件是否满足
+			if (!limit.checkUseCondition(beforeChangeTotalPromPrice)) {
+				return false;
+			}
+			shareSaleForNonDiscount(limit.getMaxSale());
 			break;
 		case DISCOUNT:
-			// TODO 计算，记得考虑优惠券的使用条件是否满足
+			// 判断优惠券的使用条件是否满足
+			if (!limit.checkUseCondition(beforeChangeTotalPromPrice)) {
+				return false;
+			}
 			break;
 		case RED_PACKET:
-			shareSaleForRedPacket(currentCoupon.getUseLimit().getMaxSale());
+			shareSaleForNonDiscount(currentCoupon.getUseLimit().getMaxSale());
 			break;
 		default:
 			throw new IllegalArgumentException(Constant.INVALID_INDEX);
@@ -86,7 +98,7 @@ public class WorkStep {
 		return commodityList.stream().map(Commodity::getPromotePrice).reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	private void shareSaleForRedPacket(BigDecimal maxSaleParam) {
+	private void shareSaleForNonDiscount(BigDecimal maxSaleParam) {
 		BigDecimal beforeChangeTotalPromPrice = getTotalPromPrice();
 		boolean moreThanTotalPromPrice = maxSaleParam.compareTo(beforeChangeTotalPromPrice) >= 0;
 		if (moreThanTotalPromPrice) {

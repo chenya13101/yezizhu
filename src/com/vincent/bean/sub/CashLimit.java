@@ -21,4 +21,9 @@ public class CashLimit extends UseLimit {
 		this.minRequire = minRequire;
 	}
 
+	@Override
+	public boolean checkUseCondition(BigDecimal totalPromPrice) {
+		return totalPromPrice.compareTo(minRequire) >= 0;
+	}
+
 }

@@ -30,4 +30,10 @@ public class DiscountLimit extends UseLimit {
 		this.limitList = limitList;
 	}
 
+	@Override
+	public boolean checkUseCondition(BigDecimal totalPromPrice) {
+		return this.limitList.stream().filter(subLimit -> totalPromPrice.compareTo(subLimit.getMinRequire()) >= 0)
+				.count() > 0;
+	}
+
 }
