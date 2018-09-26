@@ -131,7 +131,6 @@ public class CouponTemplateUtil {
 		return null;
 	}
 
-	// TODO
 	public static Coupon getRangeCommodityCoupon(CouponTypeEnum typeEnum, int maxSaleParam, String code,
 			BigDecimal minRequire, List<PromotionCommodity> commodityList) {
 		switch (typeEnum) {
@@ -140,12 +139,10 @@ public class CouponTemplateUtil {
 		case CASH:
 			return getCashRangeCommodityCoupon(maxSaleParam, code, minRequire, commodityList);
 		case DISCOUNT:
-
-			break;
+			throw new IllegalArgumentException("暂不支持");
 		default:
-			break;
+			throw new IllegalArgumentException("异常");
 		}
-		return null;
 	}
 
 	private static Coupon getCashRangeCommodityCoupon(int maxSaleParam, String code, BigDecimal minRequire,
@@ -163,5 +160,21 @@ public class CouponTemplateUtil {
 		PromotionRange promotionRange = new PromotionRange(promotionType, commodityList);
 		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
 
+	}
+
+	public static Coupon getDiscountRangeCommodityCoupon(double maxSaleParam, String code,
+			List<SubDiscountLimit> limitList, List<PromotionCommodity> commodityList) {
+		BigDecimal maxSale = new BigDecimal(maxSaleParam);
+		String name = "最高" + maxSaleParam
+				+ commodityList.stream().map(PromotionCommodity::getName).collect(Collectors.joining("-")) + "满折券";
+
+		UseLimitInward useLimitInward = new UseLimitInward();
+		useLimitInward.setMaxSale(maxSale);
+		useLimitInward.setDiscountLimitList(limitList);
+
+		int couponType = CouponTypeEnum.DISCOUNT.getIndex();
+		int promotionType = PromotionRangeTypeEnum.COMMODITY.getIndex();
+		PromotionRange promotionRange = new PromotionRange(promotionType, commodityList);
+		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
 	}
 }
