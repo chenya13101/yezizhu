@@ -75,7 +75,7 @@ public class CouponTemplateUtil {
 	}
 
 	/**
-	 * 得到红包全场优惠券的模板
+	 * 得到CouponTypeEnum全场优惠券的模板
 	 * 
 	 * @return
 	 */
