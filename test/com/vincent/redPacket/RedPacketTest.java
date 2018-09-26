@@ -22,7 +22,6 @@ import com.vincent.util.CouponTemplateUtil;
 import com.vincent.workflow.WorkFlowFactory;
 
 public class RedPacketTest {
-
 	// TODO 如果最后的金额一致，同时一个组内包含另一个组全部券码。取size小的，淘汰掉大的
 
 	@Test
