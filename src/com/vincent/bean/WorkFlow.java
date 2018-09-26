@@ -51,6 +51,12 @@ public class WorkFlow {
 		for (; i < size; i++) {
 			WorkStep step = workSteps.get(i);
 			if (!step.run()) { // true: 代表有改变; false: 代表并未改变范围内商品的优惠价格
+				if (i == 0) {
+					workSteps.clear();
+					System.out.println("第一步不满足条件,放弃整个flow");
+					return;
+				}
+
 				unavailableSteps.add(step);
 				continue;
 			}
