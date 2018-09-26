@@ -48,9 +48,4 @@ public class EnumUtil {
 		throw new IllegalArgumentException(Constant.INVALID_INDEX);
 	}
 
-	public static void main(String[] args) {
-		Predicate<PromotionRangeTypeEnum> predicate = enumKey -> 2 == enumKey.getIndex();
-		PromotionRangeTypeEnum enum1 = EnumUtil.getEnumObject(PromotionRangeTypeEnum.class, predicate);
-		System.out.println(enum1);
-	}
 }

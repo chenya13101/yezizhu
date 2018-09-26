@@ -1,4 +1,4 @@
-package com.vincent.redPacket;
+package com.vincent.demo;
 
 import static java.util.stream.Collectors.toList;
 
