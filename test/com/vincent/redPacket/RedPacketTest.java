@@ -40,8 +40,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.forEach(System.out::println);
@@ -63,8 +65,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.forEach(System.out::println);
@@ -92,8 +96,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.forEach(System.out::println);
@@ -121,8 +127,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
@@ -156,8 +164,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
@@ -191,8 +201,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
@@ -215,8 +227,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -240,8 +254,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -271,8 +287,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -303,8 +321,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -353,8 +373,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -403,8 +425,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -453,8 +477,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -503,8 +529,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -541,8 +569,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -585,8 +615,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -629,8 +661,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
@@ -664,8 +698,8 @@ public class RedPacketTest {
 		couponCode2.setCoupon(coupon2);
 		couponCode2.setReceiveTime(new Date());
 
-		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(10));// FIXME 降低价格到 两个coupon comm之间
-		Commodity comm2 = new Commodity("XiGua", new BigDecimal(30));
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(10));
+		Commodity comm2 = new Commodity("XiGua", new BigDecimal(5));
 		Commodity comm3 = new Commodity("BeiZi", new BigDecimal(10));
 
 		List<Commodity> commodityList = Arrays.asList(comm1, comm2, comm3);
@@ -673,8 +707,10 @@ public class RedPacketTest {
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
-			flow.start();
-			return CompletableFuture.supplyAsync(() -> flow.getResult());
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
 		}).collect(toList());
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).collect(toList());
 
