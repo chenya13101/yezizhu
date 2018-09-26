@@ -200,18 +200,18 @@ public class CashTest {
 	}
 
 	@Test
-	public void manyAll() {// TODO test
-		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(10);
+	public void manyAll() {
+		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 20, "QCMJ001", new BigDecimal(50));
 		CouponCode couponCode1 = new CouponCode();
 		couponCode1.setCode("HBQC001");
 		couponCode1.setCoupon(coupon);
 
-		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(15);
+		Coupon coupon2 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 30, "QCMJ002", new BigDecimal(60));
 		CouponCode couponCode2 = new CouponCode();
 		couponCode2.setCode("HBQC002");
 		couponCode2.setCoupon(coupon2);
 
-		Coupon coupon3 = CouponTemplateUtil.getRedPacketAllCoupon(15);
+		Coupon coupon3 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 25, "QCMJ003", new BigDecimal(70));
 		CouponCode couponCode3 = new CouponCode();
 		couponCode3.setCode("HBQC003");
 		couponCode3.setCoupon(coupon3);
@@ -234,22 +234,22 @@ public class CashTest {
 				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(110)), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(120)), 0);
 	}
 
 	@Test
 	public void manyAllOver() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(180);
+		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 25, "QCMJ001", new BigDecimal(50));
 		CouponCode couponCode1 = new CouponCode();
 		couponCode1.setCode("HBQC001");
 		couponCode1.setCoupon(coupon);
-		// TODO test
-		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(50);
+
+		Coupon coupon2 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 160, "QCMJ002", new BigDecimal(60));
 		CouponCode couponCode2 = new CouponCode();
 		couponCode2.setCode("HBQC002");
 		couponCode2.setCoupon(coupon2);
 
-		Coupon coupon3 = CouponTemplateUtil.getRedPacketAllCoupon(110);
+		Coupon coupon3 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 140, "QCMJ003", new BigDecimal(70));
 		CouponCode couponCode3 = new CouponCode();
 		couponCode3.setCode("HBQC003");
 		couponCode3.setCoupon(coupon3);
@@ -277,13 +277,17 @@ public class CashTest {
 
 	@Test
 	public void oneCommodity() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon(8, "SPHB001");
+		PromotionCommodity pcomm1 = new PromotionCommodity("韶音耳机", "ShaoYin");
+		PromotionCommodity pcomm2 = new PromotionCommodity("西瓜", "XiGua");
+		PromotionCommodity pcomm3 = new PromotionCommodity("电脑", "DianNao");
+
+		Coupon coupon = CouponTemplateUtil.getRangeCommodityCoupon(CouponTypeEnum.CASH, 10, "QCMJ001",
+				new BigDecimal(50), Arrays.asList(pcomm1, pcomm2, pcomm3));
 		CouponCode couponCode = new CouponCode();
-		couponCode.setCode("HBSP002");
+		couponCode.setCode("SPDJ001");
 		couponCode.setCoupon(coupon);
-		// TODO test
 		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(100));
-		Commodity comm2 = new Commodity("Book", new BigDecimal(15));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
 
 		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
 		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
@@ -299,21 +303,24 @@ public class CashTest {
 				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(107)), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(110)), 0);
 	}
 
 	@Test
 	public void oneCommodityOver() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketCommodityCoupon(125, "SPHB001");
-		CouponCode couponCode = new CouponCode();
-		couponCode.setCode("HBSP002");
-		couponCode.setCoupon(coupon);
+		PromotionCommodity pcomm1 = new PromotionCommodity("韶音耳机", "ShaoYin");
+		PromotionCommodity pcomm2 = new PromotionCommodity("西瓜", "XiGua");
+		PromotionCommodity pcomm3 = new PromotionCommodity("电脑", "DianNao");
 
+		Coupon coupon = CouponTemplateUtil.getRangeCommodityCoupon(CouponTypeEnum.CASH, 120, "QCMJ001",
+				new BigDecimal(50), Arrays.asList(pcomm1, pcomm2, pcomm3));
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("SPDJ001");
+		couponCode.setCoupon(coupon);
 		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(100));
 		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
-		Commodity comm3 = new Commodity("BeiZi", new BigDecimal(40));
-		// TODO test
-		List<Commodity> commodityList = Arrays.asList(comm1, comm2, comm3);
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
 		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
@@ -327,7 +334,7 @@ public class CashTest {
 				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(60)), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(20)), 0);
 	}
 
 	@Test

@@ -13,6 +13,8 @@ import com.vincent.bean.sub.SubDiscountLimit;
  *
  */
 public class UseLimitInward {
+
+	// minRequire 在前端传入时做验证一定要 >= maxSale
 	private BigDecimal minRequire;
 
 	private BigDecimal maxSale;

@@ -102,7 +102,6 @@ public class CouponTemplateUtil {
 		UseLimitInward useLimitInward = new UseLimitInward();
 		useLimitInward.setMaxSale(maxSale);
 		useLimitInward.setMinRequire(minRequire);
-		// useLimitInward.setMinRequire(new BigDecimal(10)); //TODO 试试看如果不传抛出错误
 
 		int couponType = CouponTypeEnum.CASH.getIndex();
 		int promotionType = PromotionRangeTypeEnum.ALL.getIndex();
@@ -116,5 +115,39 @@ public class CouponTemplateUtil {
 
 	public static Coupon getCashCoupon() {
 		return null;
+	}
+
+	// TODO
+	public static Coupon getRangeCommodityCoupon(CouponTypeEnum typeEnum, int maxSaleParam, String code,
+			BigDecimal minRequire, List<PromotionCommodity> commodityList) {
+		switch (typeEnum) {
+		case RED_PACKET:
+			return getRedPacketCommodityCoupon(maxSaleParam, code);
+		case CASH:
+			return getCashRangeCommodityCoupon(maxSaleParam, code, minRequire, commodityList);
+		case DISCOUNT:
+
+			break;
+		default:
+			break;
+		}
+		return null;
+	}
+
+	private static Coupon getCashRangeCommodityCoupon(int maxSaleParam, String code, BigDecimal minRequire,
+			List<PromotionCommodity> commodityList) {
+		BigDecimal maxSale = new BigDecimal(maxSaleParam);
+		String name = maxSaleParam + "元"
+				+ commodityList.stream().map(PromotionCommodity::getName).collect(Collectors.joining("-")) + "代金券";
+
+		UseLimitInward useLimitInward = new UseLimitInward();
+		useLimitInward.setMinRequire(minRequire);
+		useLimitInward.setMaxSale(maxSale);
+		int couponType = CouponTypeEnum.CASH.getIndex();
+		int promotionType = PromotionRangeTypeEnum.COMMODITY.getIndex();
+
+		PromotionRange promotionRange = new PromotionRange(promotionType, commodityList);
+		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
+
 	}
 }
