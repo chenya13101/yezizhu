@@ -104,22 +104,21 @@ public class CashTest {
 
 	@Test
 	public void twoAll() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(10);
-		CouponCode couponCode1 = new CouponCode();
-		couponCode1.setCode("HBQC001");
-		couponCode1.setCoupon(coupon);
-		// TODO test
-		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(15);
+		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 20, "QCMJ002", new BigDecimal(100));
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("QQCMJ001");
+		couponCode.setCoupon(coupon);
+
+		Coupon coupon2 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 25, "QCMJ001", new BigDecimal(100));
 		CouponCode couponCode2 = new CouponCode();
-		couponCode2.setCode("HBQC002");
+		couponCode2.setCode("QQCMJ002");
 		couponCode2.setCoupon(coupon2);
 
-		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(80));
-		Commodity comm2 = new Commodity("Book", new BigDecimal(50));
-		Commodity comm3 = new Commodity("XiGua", new BigDecimal(20));
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(90));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
 
-		List<Commodity> commodityList = Arrays.asList(comm1, comm2, comm3);
-		List<CouponCode> couponCodeList = Arrays.asList(couponCode1, couponCode2);
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
+		List<CouponCode> couponCodeList = Collections.singletonList(couponCode2);
 		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
 
 		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
@@ -131,20 +130,53 @@ public class CashTest {
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
 				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(125)), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(85)), 0);
 	}
 
 	@Test
-	public void twoAllOver() {// TODO test
-		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(15);
-		CouponCode couponCode1 = new CouponCode();
-		couponCode1.setCode("HBQC001");
-		couponCode1.setCoupon(coupon);
+	public void twoAll2() {
+		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 20, "QCMJ002", new BigDecimal(90));
+		CouponCode couponCode = new CouponCode();
+		couponCode.setCode("QQCMJ001");
+		couponCode.setCoupon(coupon);
 
-		Coupon coupon2 = CouponTemplateUtil.getRedPacketAllCoupon(150);
+		Coupon coupon2 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 25, "QCMJ001", new BigDecimal(120));
 		CouponCode couponCode2 = new CouponCode();
-		couponCode2.setCode("HBQC002");
+		couponCode2.setCode("QQCMJ002");
 		couponCode2.setCoupon(coupon2);
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(90));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
+
+		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
+		List<CouponCode> couponCodeList = Arrays.asList(couponCode, couponCode2);
+		List<WorkFlow> workFlowList = WorkFlowFactory.buildWorkFlow(commodityList, couponCodeList);
+
+		List<CompletableFuture<CouponGroup>> calculateFutures = workFlowList.stream().map(flow -> {
+			return CompletableFuture.supplyAsync(() -> {
+				flow.start();
+				return flow.getResult();
+			});
+		}).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		groups.forEach(System.out::println);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(90)), 0);
+	}
+
+	@Test
+	public void twoAllOver() {
+		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 150, "QCMJ001", new BigDecimal(90));
+		CouponCode couponCode1 = new CouponCode();
+		couponCode1.setCode("QQCMJ001");
+		couponCode1.setCoupon(coupon);
+		couponCode1.setReceiveTime(new Date());
+
+		Coupon coupon2 = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 150, "QCMJ002", new BigDecimal(60));
+		CouponCode couponCode2 = new CouponCode();
+		couponCode2.setCode("QQCMJ002");
+		couponCode2.setCoupon(coupon2);
+		couponCode2.setReceiveTime(new Date());
 
 		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(80));
 		Commodity comm2 = new Commodity("Book", new BigDecimal(50));
