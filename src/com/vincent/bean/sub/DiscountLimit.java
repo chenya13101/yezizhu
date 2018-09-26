@@ -42,8 +42,8 @@ public class DiscountLimit extends UseLimit {
 	 * 找到最大的折扣
 	 */
 	public BigDecimal getBestDiscount(BigDecimal totalPromPrice) {
-		limitList.stream().sorted(Comparator.comparing(SubDiscountLimit::getDiscount));
 		Optional<SubDiscountLimit> optionalLimit = limitList.stream()
+				.sorted(Comparator.comparing(SubDiscountLimit::getDiscount))
 				.filter(subLimit -> subLimit.getMinRequire().compareTo(totalPromPrice) >= 0).findFirst();
 		return optionalLimit.isPresent() ? optionalLimit.get().getDiscount() : null;
 	}

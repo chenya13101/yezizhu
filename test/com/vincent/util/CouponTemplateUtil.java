@@ -11,6 +11,7 @@ import com.vincent.bean.enums.CouponTypeEnum;
 import com.vincent.bean.enums.PromotionRangeTypeEnum;
 import com.vincent.bean.inwardType.UseLimitInward;
 import com.vincent.bean.sub.PromotionCommodity;
+import com.vincent.bean.sub.SubDiscountLimit;
 
 public class CouponTemplateUtil {
 
@@ -86,13 +87,26 @@ public class CouponTemplateUtil {
 			return getRedPacketAllCoupon(maxSaleParam);
 		case CASH:
 			return getCashRangeAllCoupon(maxSaleParam, code, minRequire);
-		case DISCOUNT:
-
-			break;
+		// case DISCOUNT:
+		// return getDiscountRangeAllCoupon(maxSaleParam, code, minRequire);
 		default:
 			break;
 		}
 		return null;
+	}
+
+	public static Coupon getDiscountRangeAllCoupon(double maxSaleParam, String code, List<SubDiscountLimit> limitList) {
+		BigDecimal maxSale = new BigDecimal(maxSaleParam);
+		String name = maxSaleParam + "元全场满折券";
+
+		UseLimitInward useLimitInward = new UseLimitInward();
+		useLimitInward.setMaxSale(maxSale);
+		useLimitInward.setDiscountLimitList(limitList);
+
+		int couponType = CouponTypeEnum.DISCOUNT.getIndex();
+		int promotionType = PromotionRangeTypeEnum.ALL.getIndex();
+		PromotionRange promotionRange = new PromotionRange(promotionType, null);
+		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
 	}
 
 	private static Coupon getCashRangeAllCoupon(double maxSaleParam, String code, BigDecimal minRequire) {

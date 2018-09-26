@@ -1,6 +1,7 @@
 package com.vincent.bean;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import com.vincent.bean.enums.CouponTypeEnum;
@@ -18,6 +19,10 @@ import com.vincent.util.EnumUtil;
 public class WorkStep {
 
 	private BigDecimal sale = BigDecimal.ZERO;
+
+	private static final BigDecimal TEN = new BigDecimal(10);
+
+	private static final int NUM_AFTER_POINT = 4;
 
 	private CouponCode couponCode;
 	// 整个过程中 couponCode不能做任何的变更
@@ -99,9 +104,13 @@ public class WorkStep {
 
 	/**
 	 * 计算折扣券
+	 * 
+	 * @param discount
+	 *            8.5代表八五折
 	 */
 	private void calculateForDiscount(BigDecimal beforeChangeTotalPromPrice, BigDecimal discount, BigDecimal maxSale) {
-		BigDecimal discountSale = beforeChangeTotalPromPrice.subtract(beforeChangeTotalPromPrice.multiply(discount));
+		BigDecimal discountSale = beforeChangeTotalPromPrice.subtract(
+				beforeChangeTotalPromPrice.multiply(discount).divide(TEN, NUM_AFTER_POINT, RoundingMode.HALF_UP));
 		if (discountSale.compareTo(maxSale) >= 0) {
 			shareSaleForNonDiscount(maxSale);
 		} else {
