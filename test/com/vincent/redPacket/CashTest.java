@@ -44,13 +44,14 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(90)), 0);
 	}
 
 	@Test
-	public void oneAllMinRequire() {// TODO test
+	public void oneAllMinRequire() {
 		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 10, "QCMJ001", new BigDecimal(101));
 		CouponCode couponCode = new CouponCode();
 		couponCode.setCode("QQCMJ001");
@@ -69,20 +70,21 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.size(), 0);
 	}
 
 	@Test
 	public void oneAllOver() {
-		Coupon coupon = CouponTemplateUtil.getRedPacketAllCoupon(150);
+		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 50, "QCMJ001", new BigDecimal(100));
 		CouponCode couponCode = new CouponCode();
-		couponCode.setCode("HBQC001");
+		couponCode.setCode("QQCMJ001");
 		couponCode.setCoupon(coupon);
-		// TODO test
-		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(100));
-		Commodity comm2 = new Commodity("Book", new BigDecimal(15));
+
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(80));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
 
 		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
 		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
@@ -94,9 +96,10 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(0)), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(50)), 0);
 	}
 
 	@Test
@@ -125,7 +128,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(125)), 0);
 	}
@@ -156,7 +160,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(0)), 0);
@@ -193,7 +198,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(110)), 0);
@@ -230,7 +236,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(0)), 0);
@@ -256,7 +263,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(107)), 0);
@@ -283,7 +291,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.forEach(System.out::println);
 		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(60)), 0);
@@ -316,7 +325,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -350,7 +360,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -402,7 +413,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -454,7 +466,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -506,7 +519,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -558,7 +572,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -598,7 +613,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -644,7 +660,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -690,7 +707,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
@@ -736,7 +754,8 @@ public class CashTest {
 				return flow.getResult();
 			});
 		}).collect(toList());
-		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join).filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
+		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
+				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 
 		groups.sort((tmpGroup1, tmpGroup2) -> tmpGroup1.getTotal().compareTo(tmpGroup2.getTotal()));
 		groups.forEach(System.out::println);
