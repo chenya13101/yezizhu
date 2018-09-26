@@ -74,6 +74,42 @@ public class CouponTemplateUtil {
 		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
 	}
 
+	/**
+	 * 得到红包全场优惠券的模板
+	 * 
+	 * @return
+	 */
+	public static Coupon getRangeAllCoupon(CouponTypeEnum typeEnum, double maxSaleParam, String code,
+			BigDecimal minRequire) {
+		switch (typeEnum) {
+		case RED_PACKET:
+			return getRedPacketAllCoupon(maxSaleParam);
+		case CASH:
+			return getCashRangeAllCoupon(maxSaleParam, code, minRequire);
+		case DISCOUNT:
+
+			break;
+		default:
+			break;
+		}
+		return null;
+	}
+
+	private static Coupon getCashRangeAllCoupon(double maxSaleParam, String code, BigDecimal minRequire) {
+		BigDecimal maxSale = new BigDecimal(maxSaleParam);
+		String name = maxSaleParam + "元全场满减券";
+
+		UseLimitInward useLimitInward = new UseLimitInward();
+		useLimitInward.setMaxSale(maxSale);
+		useLimitInward.setMinRequire(minRequire);
+		// useLimitInward.setMinRequire(new BigDecimal(10)); //TODO 试试看如果不传抛出错误
+
+		int couponType = CouponTypeEnum.CASH.getIndex();
+		int promotionType = PromotionRangeTypeEnum.ALL.getIndex();
+		PromotionRange promotionRange = new PromotionRange(promotionType, null);
+		return new Coupon(code, name, promotionRange, couponType, useLimitInward);
+	}
+
 	public static Coupon getDiscountCoupon() {
 		return null;
 	}
