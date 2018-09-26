@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.vincent.bean.enums.CouponTypeEnum;
+import com.vincent.bean.sub.DiscountLimit;
 import com.vincent.common.Constant;
 import com.vincent.util.EnumUtil;
 
@@ -16,11 +17,7 @@ import com.vincent.util.EnumUtil;
  */
 public class WorkStep {
 
-	// private final static BigDecimal TEN = new BigDecimal(10);
-
 	private BigDecimal sale = BigDecimal.ZERO;
-
-	// private Map<String, BigDecimal> goodsCodePriceMap = new HashMap<>();
 
 	private CouponCode couponCode;
 	// 整个过程中 couponCode不能做任何的变更
@@ -81,6 +78,12 @@ public class WorkStep {
 			if (!limit.checkUseCondition(beforeChangeTotalPromPrice)) {
 				return false;
 			}
+
+			BigDecimal bestDiscount = ((DiscountLimit) limit).getBestDiscount(beforeChangeTotalPromPrice);
+			if (bestDiscount == null || bestDiscount.compareTo(BigDecimal.ZERO) <= 0)
+				return false;
+
+			calculateForDiscount(beforeChangeTotalPromPrice, bestDiscount, limit.getMaxSale());
 			break;
 		case RED_PACKET:
 			shareSaleForNonDiscount(currentCoupon.getUseLimit().getMaxSale());
@@ -92,6 +95,18 @@ public class WorkStep {
 
 		this.sale = beforeChangeTotalPromPrice.subtract(getTotalPromPrice());
 		return this.sale.compareTo(BigDecimal.ZERO) > 0;
+	}
+
+	/**
+	 * 计算折扣券
+	 */
+	private void calculateForDiscount(BigDecimal beforeChangeTotalPromPrice, BigDecimal discount, BigDecimal maxSale) {
+		BigDecimal discountSale = beforeChangeTotalPromPrice.subtract(beforeChangeTotalPromPrice.multiply(discount));
+		if (discountSale.compareTo(maxSale) >= 0) {
+			shareSaleForNonDiscount(maxSale);
+		} else {
+			shareSaleForNonDiscount(discountSale);
+		}
 	}
 
 	private BigDecimal getTotalPromPrice() {

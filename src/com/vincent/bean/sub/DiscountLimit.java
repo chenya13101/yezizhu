@@ -2,7 +2,9 @@ package com.vincent.bean.sub;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import com.vincent.bean.UseLimit;
 
@@ -34,6 +36,16 @@ public class DiscountLimit extends UseLimit {
 	public boolean checkUseCondition(BigDecimal totalPromPrice) {
 		return this.limitList.stream().filter(subLimit -> totalPromPrice.compareTo(subLimit.getMinRequire()) >= 0)
 				.count() > 0;
+	}
+
+	/**
+	 * 找到最大的折扣
+	 */
+	public BigDecimal getBestDiscount(BigDecimal totalPromPrice) {
+		limitList.stream().sorted(Comparator.comparing(SubDiscountLimit::getDiscount));
+		Optional<SubDiscountLimit> optionalLimit = limitList.stream()
+				.filter(subLimit -> subLimit.getMinRequire().compareTo(totalPromPrice) >= 0).findFirst();
+		return optionalLimit.isPresent() ? optionalLimit.get().getDiscount() : null;
 	}
 
 }
