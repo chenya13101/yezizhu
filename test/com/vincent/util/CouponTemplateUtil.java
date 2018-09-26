@@ -97,7 +97,7 @@ public class CouponTemplateUtil {
 
 	public static Coupon getDiscountRangeAllCoupon(double maxSaleParam, String code, List<SubDiscountLimit> limitList) {
 		BigDecimal maxSale = new BigDecimal(maxSaleParam);
-		String name = maxSaleParam + "元全场满折券";
+		String name = "最高" + maxSaleParam + "元全场满折券";
 
 		UseLimitInward useLimitInward = new UseLimitInward();
 		useLimitInward.setMaxSale(maxSale);

@@ -88,10 +88,15 @@ public class DiscountTest {
 	}
 
 	@Test
-	public void oneAllMinRequire() { // TODO
-		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 10, "QCMJ001", new BigDecimal(101));
+	public void oneAllMinRequire() {
+		SubDiscountLimit subLimit1 = new SubDiscountLimit(new BigDecimal(50), new BigDecimal(9.0));
+		SubDiscountLimit subLimit2 = new SubDiscountLimit(new BigDecimal(120), new BigDecimal(8.0));
+		SubDiscountLimit subLimit3 = new SubDiscountLimit(new BigDecimal(800), new BigDecimal(5.0));
+		List<SubDiscountLimit> limitList = Arrays.asList(subLimit1, subLimit2, subLimit3);
+
+		Coupon coupon = CouponTemplateUtil.getDiscountRangeAllCoupon(10, "QCMZ001", limitList);
 		CouponCode couponCode = new CouponCode();
-		couponCode.setCode("QQCMJ001");
+		couponCode.setCode("QQCMZ001");
 		couponCode.setCoupon(coupon);
 
 		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(80));
@@ -110,18 +115,23 @@ public class DiscountTest {
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
 				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.size(), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(90)), 0);
 	}
 
 	@Test
-	public void oneAllOver() { // TODO
-		Coupon coupon = CouponTemplateUtil.getRangeAllCoupon(CouponTypeEnum.CASH, 50, "QCMJ001", new BigDecimal(100));
+	public void oneAllOver() {
+		SubDiscountLimit subLimit1 = new SubDiscountLimit(new BigDecimal(50), new BigDecimal(9.0));
+		SubDiscountLimit subLimit2 = new SubDiscountLimit(new BigDecimal(120), new BigDecimal(8.0));
+		SubDiscountLimit subLimit3 = new SubDiscountLimit(new BigDecimal(800), new BigDecimal(5.0));
+		List<SubDiscountLimit> limitList = Arrays.asList(subLimit1, subLimit2, subLimit3);
+
+		Coupon coupon = CouponTemplateUtil.getDiscountRangeAllCoupon(400, "QCMZ001", limitList);
 		CouponCode couponCode = new CouponCode();
-		couponCode.setCode("QQCMJ001");
+		couponCode.setCode("QQCMZ001");
 		couponCode.setCoupon(coupon);
 
-		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(80));
-		Commodity comm2 = new Commodity("Book", new BigDecimal(20));
+		Commodity comm1 = new Commodity("ShaoYin", new BigDecimal(800));
+		Commodity comm2 = new Commodity("Book", new BigDecimal(200));
 
 		List<Commodity> commodityList = Arrays.asList(comm1, comm2);
 		List<CouponCode> couponCodeList = Collections.singletonList(couponCode);
@@ -136,7 +146,7 @@ public class DiscountTest {
 		List<CouponGroup> groups = calculateFutures.stream().map(CompletableFuture::join)
 				.filter(group -> group.getCouponCodeList().size() > 0).collect(toList());
 		groups.forEach(System.out::println);
-		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(50)), 0);
+		Assert.assertEquals(groups.get(0).getTotal().compareTo(new BigDecimal(600)), 0);
 	}
 
 	@Test
